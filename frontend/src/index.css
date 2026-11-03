@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+html, body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE et Edge */
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari et Opera */
+}
+
+@theme {
+  /* Couleurs de la maquette */
+  --color-background: #faf8ff;
+  --color-surface: #faf8ff;
+  --color-surface-dim: #d2d9f4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f3ff;
+  --color-surface-container: #eaedff;
+  --color-surface-container-high: #e2e7ff;
+  --color-surface-container-highest: #dae2fd;
+  --color-on-surface: #131b2e;
+  --color-on-surface-variant: #5c403f;
+  --color-primary: #9e001f;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #c8102e;
+  --color-secondary: #006c53;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #95f5d2;
+  --color-on-secondary-container: #007258;
+  --color-tertiary: #654700;
+  --color-tertiary-fixed: #ffdea6;
+  --color-tertiary-fixed-dim: #febb21;
+
+  /* Espacements de la maquette */
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2.5rem;
+  --spacing-space-2xl: 4rem;
+  --spacing-margin: 2.5rem;
+  --spacing-margin-mobile: 1.25rem;
+}
