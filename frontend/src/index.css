@@ -5,6 +5,12 @@ html, body {
   -ms-overflow-style: none; /* IE et Edge */
 }
 
+/* Bloc pour figer les lignes aux couleurs du cameroun en base */
+html, body {
+  overscroll-behavior-y: none;
+  background-color: #ffffff;
+}
+
 html::-webkit-scrollbar, body::-webkit-scrollbar {
   display: none; /* Chrome, Safari et Opera */
 }

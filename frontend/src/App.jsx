@@ -5,7 +5,10 @@ import Home from './Home';
 import Program from './Program';
 import Inscription from './Inscription';
 import Informations from './Informations';
-import Contact from './Contact'; // <-- Importation de la page Contact
+import Contact from './Contact'; 
+import Paiement from './Paiement';
+import MonBadge from './MonBadge';
+import VerifierBadge from './VerifierBadge';
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
             <Route path="/inscription" element={<Inscription />} />
             <Route path="/informations" element={<Informations />} />
             <Route path="/contact" element={<Contact />} /> {/* <-- Route active */}
+            <Route path="/paiement" element={<Paiement />} />
+            <Route path="/mon-badge" element={<MonBadge />} />
+            <Route path="/verifier" element={<VerifierBadge />} />
           </Routes>
         </main>
         

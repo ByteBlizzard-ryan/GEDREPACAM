@@ -1,48 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Home, ShieldCheck, GraduationCap, Microscope, Banknote, 
+  ShieldCheck, GraduationCap, Microscope, Banknote, 
   Stethoscope, Users, School, Award, CheckCircle2, 
-  UserCheck, ArrowRight, Lock, LifeBuoy, Mail, Phone, 
-  FileText, Building2, HelpCircle 
+  UserCheck, ArrowRight, Lock, LifeBuoy, Mail 
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
+// Grille tarifaire officielle en FCFA
+const TARIFS = {
+  "Médecin (Spécialiste ou Généraliste)": 25000,
+  "Enseignant Universitaire": 25000,
+  "Pharmacien hospitalier /officine": 25000,
+  "Infirmier /Soignant": 10000,
+  "Techinicien de laboratoire": 10000,
+  "Chercheur / Généticien": 15000, // Ajustez selon votre grille réelle
+  "Autre profession de santé": 15000 // Ajustez selon votre grille réelle
+};
 
 function Inscription() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
     const form = e.target;
-    const formData = new FormData();
     
-    // 1. Association de vos champs de formulaire avec les NOUVEAUX ID entry de Google Forms
-    formData.append('entry.45420605', form.elements['reg-lastname'].value); // Noms
-    formData.append('entry.627195857', form.elements['reg-title'].value); // Titre honorifique
-    formData.append('entry.911358404', form.elements['reg-quality'].value); // Statut
-    formData.append('entry.2129644551', form.elements['reg-email'].value); // E-mail
-    formData.append('entry.600935535', form.elements['reg-firstname'].value); // Prénoms
-    formData.append('entry.1249499698', form.elements['reg-profession'].value); // Profession
-    formData.append('entry.1525826361', form.elements['reg-institution'].value); // Organisation
-    formData.append('entry.203174067', form.elements['reg-phone'].value); // Téléphone
+    // Récupérer la profession choisie
+    const profession = form.elements['reg-profession'].value;
+    
+    // Calculer le prix à payer
+    const prixAPayer = TARIFS[profession] || 0;
 
-    // L'URL DOIT se terminer par /formResponse (et non /edit)
-    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe162SiUM-eBUW62iGd-psJTnxyxX_eXN5w0yJpGvmihHdG_A/formResponse";
-    try {
-      // 2. Envoi silencieux vers Google Forms avec le mode no-cors
-      await fetch(GOOGLE_FORM_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
-      });
-      
-      // 3. Affichage du succès et nettoyage du formulaire
-      setModalOpen(true);
-      form.reset();
-    } catch (error) {
-      console.error("Erreur lors de l'envoi :", error);
-      alert("Une erreur de réseau est survenue lors de l'inscription.");
-    }
+    // Regrouper les données du formulaire
+    const formData = {
+      noms: form.elements['reg-lastname'].value,
+      titre: form.elements['reg-title'].value,
+      statut: form.elements['reg-quality'].value,
+      email: form.elements['reg-email'].value,
+      prenoms: form.elements['reg-firstname'].value,
+      profession: profession,
+      institution: form.elements['reg-institution'].value,
+      telephone: form.elements['reg-phone'].value,
+    };
+
+    // Rediriger vers la page de paiement en passant les données en mémoire
+    navigate('/paiement', { 
+      state: { 
+        donneesInscription: formData, 
+        montant: prixAPayer 
+      } 
+    });
   };
 
   return (
@@ -466,7 +472,7 @@ function Inscription() {
                     className="w-full md:w-auto md:min-w-[340px] px-space-xl py-3.5 rounded-lg bg-primary-container text-on-primary text-[20px] font-bold flex items-center justify-center gap-space-sm hover:bg-primary transition-colors shadow-lg shadow-primary-container/20 group cursor-pointer" 
                     type="submit"
                   >
-                    <span>Valider mon inscription</span>
+                    <span>S'inscrire et procéder au paiement</span>
                     <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
                   </button>
                   
@@ -504,40 +510,6 @@ function Inscription() {
             </div>
           </div>
         </section>
-
-        {/* Modal de confirmation de soumission réussie */}
-        {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-margin-mobile">
-            <div className="bg-surface-container-lowest rounded-2xl max-w-lg w-full p-space-xl shadow-2xl text-center space-y-space-md">
-              <div className="w-16 h-16 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center mx-auto">
-                <CheckCircle2 size={32} />
-              </div>
-              <div className="space-y-space-xs">
-                <h3 className="text-[26px] font-bold text-on-surface">Pré-inscription enregistrée !</h3>
-                <p className="text-[15px] text-on-surface-variant">
-                  Votre dossier pour le 5ème Congrès International a bien été transmis. Un e-mail de confirmation accompagné de votre numéro de référence temporaire vous a été envoyé.
-                </p>
-              </div>
-              <div className="p-space-md rounded-xl bg-surface-container-low text-left space-y-1 text-[13px] text-on-surface font-medium">
-                <div className="flex justify-between">
-                  <span className="text-on-surface-variant">Lieu :</span>
-                  <span className="font-semibold">Palais des Congrès de Yaoundé</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-on-surface-variant">Statut :</span>
-                  <span className="font-semibold text-secondary">En attente de règlement final</span>
-                </div>
-              </div>
-              <button 
-                className="w-full py-3 rounded-lg bg-primary-container text-on-primary text-[14px] hover:bg-primary transition-colors font-bold cursor-pointer" 
-                onClick={() => setModalOpen(false)} 
-                type="button"
-              >
-                Fermer cette fenêtre
-              </button>
-            </div>
-          </div>
-        )}
 
       </div>
     </main>
