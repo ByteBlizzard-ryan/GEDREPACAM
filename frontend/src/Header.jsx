@@ -10,7 +10,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X,ArrowRight } from 'lucide-react';
 import logo from './assets/logo.png';
 
 const RED = '#c11236';
@@ -24,7 +24,7 @@ const LINKS = [
   { to: '/', label: 'Accueil' },
   { to: '/programme', label: 'Programme' },
   { to: '/inscription', label: 'Inscription' },
-  { to: '/informations', label: 'Informations pratiques' },
+  { to: '/informations', label: 'Nos Sponsors & Partenaires' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -153,12 +153,23 @@ function Header() {
               ))}
             </div>
 
-            <button
+            {/* <button
               type="button"
               className={`rounded-full bg-[#c11236] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(193,18,54,0.6)] transition-all duration-200 hover:bg-[#a30e2d] hover:shadow-[0_8px_20px_-6px_rgba(193,18,54,0.7)] active:scale-[0.98] ${focusRing}`}
             >
               S'inscrire maintenant
-            </button>
+            </button> */}
+             <Link
+              to="/inscription"
+              className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-5 py-2.5 text-[13.5px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] ${focusRing}`}
+            >
+              <span>S’inscrire maintenant</span>
+              <ArrowRight
+                size={15}
+                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
 
           </div>
 
@@ -212,13 +223,17 @@ function Header() {
         </nav>
 
         <div className="mt-8 flex flex-col gap-3">
-          <button
-            type="button"
-            className={`w-full rounded-full bg-[#c11236] py-3.5 text-[16px] font-bold text-white active:scale-[0.99] ${focusRing}`}
-          >
-            S'inscrire maintenant
-          </button>
-
+        <Link
+              to="/inscription"
+              className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-5 py-2.5 text-[13.5px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] ${focusRing}`}
+            >
+              <span>S’inscrire maintenant</span>
+              <ArrowRight
+                size={15}
+                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
 
           <div className="mt-4 flex items-center justify-between">
             <span className="text-[14px] font-medium text-[#6b6b75]">Langue de l'interface</span>

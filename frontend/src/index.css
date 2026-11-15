@@ -48,3 +48,73 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
   --spacing-margin: 2.5rem;
   --spacing-margin-mobile: 1.25rem;
 }
+
+
+/* Elements pour la nouvelle page d'acceuil  */
+.font-serif-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.015em;
+}
+
+.font-editorial-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.first-letter-drop::first-letter {
+  float: left;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 3.75rem;
+  line-height: 0.85;
+  font-weight: 700;
+  color: #8b0a1d;
+  padding-top: 4px;
+  padding-right: 14px;
+  padding-bottom: 2px;
+}
+
+.hero-overlay-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 10, 29, 0.94) 0%,
+    rgba(126, 8, 25, 0.92) 50%,
+    rgba(105, 7, 21, 0.90) 100%
+  );
+}
+
+/* .hero-overlay-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 10, 29, 0.94) 0%,
+    rgba(193, 18, 54, 0.88) 0%
+  );
+} */
+
+/* .hero-overlay-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 12, 16, 0.78) 0%,
+    rgba(139, 10, 29, 0.62) 100%
+  );
+} */
+
+/* .hero-overlay-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 10, 29, 0.68) 0%,
+    rgba(193, 18, 54, 0.55) 100%
+  );
+} */
+
+.watermark-num {
+  line-height: 0.8;
+  user-select: none;
+}
+
+.cloud-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cloud-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 24px -8px rgba(139, 10, 29, 0.12);
+}
