@@ -8,17 +8,21 @@ function Paiement() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [confirmedTransId, setConfirmedTransId] = useState(null);
 
   const donnees = location.state?.donneesInscription;
   const montant = location.state?.montant;
+  const justificatif = location.state?.justificatif;
 
   if (!donnees || !montant) {
     return (
       <div className="pt-32 text-center font-sans">
         <p>Aucune inscription en cours.</p>
-        <button onClick={() => navigate('/inscription')} className="mt-4 text-[#c11236] underline font-bold">
+        <button
+          onClick={() => navigate('/inscription')}
+          className="mt-4 text-[#c11236] underline font-bold"
+        >
           Retour à l'inscription
         </button>
       </div>
@@ -27,7 +31,7 @@ function Paiement() {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    setMessage("Initialisation du paiement en cours...");
+    setMessage('Initialisation du paiement en cours...');
 
     try {
       const API_URL = import.meta.env.VITE_FAPSHI_API_URL;
@@ -36,15 +40,17 @@ function Paiement() {
 
       const externalId = `GEDREPACAM_${Date.now()}`;
       const userId = `USER_${Date.now()}`;
-      const cleanPhone = donnees.telephone.replace(/\s+/g, '').replace(/^(\+237|237)/, '');
+      const cleanPhone = donnees.telephone
+        .replace(/\s+/g, '')
+        .replace(/^(\+237|237)/, '');
 
       // 1. Appel Direct Pay Fapshi
       const directPayResponse = await fetch(`${API_URL}/direct-pay`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'apiuser': API_USER,
-          'apikey': API_KEY
+          apiuser: API_USER,
+          apikey: API_KEY
         },
         body: JSON.stringify({
           amount: montant,
@@ -57,32 +63,41 @@ function Paiement() {
 
       const paymentData = await directPayResponse.json();
       if (!directPayResponse.ok) {
-        throw new Error(paymentData.message || "Échec de l'initialisation du paiement direct.");
+        throw new Error(
+          paymentData.message || "Échec de l'initialisation du paiement direct."
+        );
       }
 
       const transId = paymentData.transId;
 
       // 2. Vérification du statut
-      setMessage("Veuillez valider le paiement sur votre téléphone (Code secret Mobile Money)...");
+      setMessage(
+        'Veuillez valider le paiement sur votre téléphone (Code secret Mobile Money)...'
+      );
       let paymentStatus = 'PENDING';
       let attempts = 0;
       const maxAttempts = 12;
 
       while (paymentStatus === 'PENDING' || paymentStatus === 'CREATED') {
         if (attempts >= maxAttempts) {
-          throw new Error("Délai d'attente dépassé. Si vous avez été débité, contactez le support.");
+          throw new Error(
+            "Délai d'attente dépassé. Si vous avez été débité, contactez le support."
+          );
         }
 
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         attempts++;
 
-        const statusResponse = await fetch(`${API_URL}/payment-status/${transId}`, {
-          method: 'GET',
-          headers: {
-            'apiuser': API_USER,
-            'apikey': API_KEY
+        const statusResponse = await fetch(
+          `${API_URL}/payment-status/${transId}`,
+          {
+            method: 'GET',
+            headers: {
+              apiuser: API_USER,
+              apikey: API_KEY
+            }
           }
-        });
+        );
 
         const statusData = await statusResponse.json();
         if (statusResponse.ok) {
@@ -91,14 +106,49 @@ function Paiement() {
       }
 
       if (paymentStatus === 'FAILED') {
-        throw new Error("Le paiement a échoué ou a été annulé.");
+        throw new Error('Le paiement a échoué ou a été annulé.');
       }
 
-      // 3. Enregistrement Google Forms + E-mail avec lien badge + Affichage du badge
+      // 3. Archivage Drive + Nouveau Google Form + E-mail + Badge
       if (paymentStatus === 'SUCCESSFUL') {
-        setMessage("Paiement reçu ! Génération de votre badge...");
+        setMessage(
+          'Paiement reçu ! Archivage du dossier et génération du badge...'
+        );
 
-        const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe162SiUM-eBUW62iGd-psJTnxyxX_eXN5w0yJpGvmihHdG_A/formResponse";
+        let lienJustificatif = justificatif?.fileName || 'Non fourni';
+        const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL;
+
+        if (APPS_SCRIPT_URL && justificatif?.fileBase64) {
+          try {
+            const uploadRes = await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({
+                noms: donnees.noms,
+                prenoms: donnees.prenoms,
+                email: donnees.email,
+                profession: donnees.profession,
+                transId,
+                fileName: justificatif.fileName,
+                mimeType: justificatif.mimeType,
+                fileBase64: justificatif.fileBase64
+              })
+            });
+            const uploadData = await uploadRes.json();
+            if (uploadData.status === 'ok' && uploadData.fileUrl) {
+              lienJustificatif = uploadData.fileUrl;
+            }
+          } catch (uploadErr) {
+            console.error('Erreur archivage Drive :', uploadErr);
+          }
+        }
+
+        const rawBadgeUrl = construireUrlBadge({ transId, donnees });
+        const lienBadge = rawBadgeUrl.startsWith('http')
+          ? rawBadgeUrl
+          : `${window.location.origin}${rawBadgeUrl.startsWith('/') ? '' : '/'}${rawBadgeUrl}`;
+
+        const GOOGLE_FORM_URL =
+          'https://docs.google.com/forms/d/e/1FAIpQLSfwwWOHa_LCbGFAiVFzycNoBbgXw5JTLkBNH9MqeLzk511BYw/formResponse';
         const formBody = new URLSearchParams();
 
         formBody.append('entry.45420605', donnees.noms);
@@ -109,6 +159,8 @@ function Paiement() {
         formBody.append('entry.1249499698', donnees.profession);
         formBody.append('entry.1525826361', donnees.institution);
         formBody.append('entry.203174067', donnees.telephone);
+        formBody.append('entry.26771134', lienBadge);
+        formBody.append('entry.1200204970', lienJustificatif);
 
         await fetch(GOOGLE_FORM_URL, {
           method: 'POST',
@@ -116,8 +168,6 @@ function Paiement() {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: formBody.toString()
         });
-
-        const lienBadge = construireUrlBadge({ transId, donnees });
 
         try {
           await emailjs.send(
@@ -136,18 +186,22 @@ function Paiement() {
             import.meta.env.VITE_EMAILJS_PUBLIC_KEY
           );
         } catch (emailError) {
-          console.error("Paiement validé, mais erreur d'envoi de l'e-mail :", emailError);
+          console.error(
+            "Paiement validé, mais erreur d'envoi de l'e-mail :",
+            emailError
+          );
         }
 
-        // Affiche le badge directement sur la page au lieu de rediriger vers l'accueil
         setConfirmedTransId(transId);
       }
     } catch (error) {
-      console.error("Erreur de paiement", error);
-      alert(error.message || "Une erreur est survenue lors du processus de paiement.");
+      console.error('Erreur de paiement', error);
+      alert(
+        error.message || 'Une erreur est survenue lors du processus de paiement.'
+      );
     } finally {
       setIsProcessing(false);
-      setMessage("");
+      setMessage('');
     }
   };
 
@@ -168,21 +222,34 @@ function Paiement() {
         </div>
       ) : (
         <div className="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-md mx-auto">
-          <h2 className="text-2xl font-bold text-[#c11236] mb-6 text-center">Règlement</h2>
+          <h2 className="text-2xl font-bold text-[#c11236] mb-6 text-center">
+            Règlement
+          </h2>
 
           <div className="bg-gray-50 p-4 rounded-md mb-6">
             <p className="text-sm text-gray-500 mb-1">Candidat :</p>
-            <p className="font-bold text-gray-800 mb-4">{donnees.titre} {donnees.prenoms} {donnees.noms}</p>
+            <p className="font-bold text-gray-800 mb-4">
+              {donnees.titre} {donnees.prenoms} {donnees.noms}
+            </p>
 
             <p className="text-sm text-gray-500 mb-1">Profession :</p>
             <p className="font-bold text-gray-800 mb-4">{donnees.profession}</p>
 
-            <p className="text-sm text-gray-500 mb-1">E-mail de confirmation :</p>
+            <p className="text-sm text-gray-500 mb-1">Justificatif joint :</p>
+            <p className="font-bold text-gray-800 mb-4 truncate">
+              {justificatif?.fileName || 'Aucun fichier'}
+            </p>
+
+            <p className="text-sm text-gray-500 mb-1">
+              E-mail de confirmation :
+            </p>
             <p className="font-bold text-gray-800 mb-4">{donnees.email}</p>
 
             <div className="border-t border-gray-200 pt-4 mt-2 flex justify-between items-center">
               <span className="text-gray-600 font-bold">Total à payer</span>
-              <span className="text-xl font-extrabold text-[#00765a]">{montant} FCFA</span>
+              <span className="text-xl font-extrabold text-[#00765a]">
+                {montant} FCFA
+              </span>
             </div>
           </div>
 
@@ -195,7 +262,11 @@ function Paiement() {
           <button
             onClick={handlePayment}
             disabled={isProcessing}
-            className={`w-full py-3.5 rounded-md font-bold text-white transition-all shadow-sm ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#c11236] hover:bg-[#9c0e2a] hover:shadow-md'}`}
+            className={`w-full py-3.5 rounded-md font-bold text-white transition-all shadow-sm ${
+              isProcessing
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-[#c11236] hover:bg-[#9c0e2a] hover:shadow-md'
+            }`}
           >
             {isProcessing ? 'Traitement en cours...' : 'Payer maintenant'}
           </button>

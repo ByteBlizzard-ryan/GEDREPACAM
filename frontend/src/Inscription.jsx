@@ -5,134 +5,143 @@ import {
   Microscope,
   Banknote,
   Stethoscope,
-  Users,
+  Wrench,
   School,
-  Award,
+  HeartHandshake,
   UserCheck,
   ArrowRight,
   Lock,
   MapPin,
-  Check
+  Check,
+  Upload,
+  FileText,
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
-// Grille tarifaire officielle en FCFA
-const TARIFS = {
-  'Médecin (Spécialiste ou Généraliste)': 25000,
-  'Enseignant Universitaire': 25000,
-  'Pharmacien hospitalier /officine': 25000,
-  'Infirmier /Soignant': 10000,
-  'Techinicien de laboratoire': 10000,
-  'Chercheur / Généticien': 15000,
-  'Autre profession de santé': 15000,
-  'Visiteur / Délégué Institutionnel': 10000,
-  'Étudiant / Interne en Médecine': 5000
-};
-
+// Grille tarifaire officielle finale en FCFA
 const CATEGORIES_TARIFS = [
   {
-    id: 'cat-a',
-    code: 'Catégorie A',
-    badgeStyle: 'bg-[#c11236]/10 text-[#c11236]',
-    icon: Stethoscope,
-    iconColor: 'text-[#c11236]',
-    titre: "Médecin & Pharmacien spécialiste, Enseignant d'université",
-    description:
-      'Praticiens hospitaliers, hospitalo-universitaires, professeurs et directeurs de recherche.',
-    prix: '25 000',
-    devise: 'FCFA',
-    condition: null,
-    defaultProfession: 'Médecin (Spécialiste ou Généraliste)',
-    matchedProfessions: [
-      'Médecin (Spécialiste ou Généraliste)',
-      'Enseignant Universitaire',
-      'Pharmacien hospitalier /officine'
-    ]
-  },
-  {
-    id: 'cat-b',
-    code: 'Catégorie B',
-    badgeStyle: 'bg-emerald-50 text-[#00765a]',
-    icon: Microscope,
-    iconColor: 'text-[#00765a]',
-    titre: 'Médecin Généraliste, Pharmacien, Ingénieur biologie',
-    description:
-      'Corps médical général, biologistes médicaux et cadres techniques de laboratoires.',
-    prix: '15 000',
-    devise: 'FCFA',
-    condition: null,
-    defaultProfession: 'Chercheur / Généticien',
-    matchedProfessions: [
-      'Chercheur / Généticien',
-      'Autre profession de santé'
-    ]
-  },
-  {
-    id: 'cat-c',
-    code: 'Catégorie C',
+    id: 'academics',
+    code: 'Catégorie 01',
     badgeStyle: 'bg-[#8b0a1d]/10 text-[#8b0a1d]',
-    icon: Users,
+    icon: GraduationCap,
     iconColor: 'text-[#8b0a1d]',
-    titre: 'Infirmier & Technicien de laboratoire',
+    titre: 'Universitaires (Enseignants / Chercheurs)',
     description:
-      'Personnel paramédical de terrain et soignants des centres de référence drépanocytose.',
-    prix: '10 000',
+      'Enseignants-chercheurs, professeurs d’université, maîtres de conférences et chercheurs en sciences biomédicales.',
+    justificatifAttendu:
+      'Attestation de fonction universitaire, arrêté de nomination ou carte professionnelle d’enseignant-chercheur.',
+    montant: 35000,
+    prixAffiche: '35 000',
     devise: 'FCFA',
-    condition: null,
-    defaultProfession: 'Infirmier /Soignant',
-    matchedProfessions: ['Infirmier /Soignant', 'Techinicien de laboratoire']
+    condition: null
   },
   {
-    id: 'cat-d',
-    code: 'Catégorie D',
-    badgeStyle: 'bg-[#f1f1f5] text-[#555555]',
-    icon: Users,
-    iconColor: 'text-[#555555]',
-    titre: 'Visiteur & Délégué Institutionnel',
+    id: 'specialists',
+    code: 'Catégorie 02',
+    badgeStyle: 'bg-[#c11236]/10 text-[#c11236]',
+    icon: Microscope,
+    iconColor: 'text-[#c11236]',
+    titre: 'Médecins spécialistes / Biologistes',
     description:
-      "Membres d'associations de patients, observateurs, ONG et représentants de la société civile.",
-    prix: '10 000',
+      'Praticiens hospitaliers spécialistes, hématologues, pédiatres, pharmaciens biologistes et biologistes médicaux.',
+    justificatifAttendu:
+      'Carte de l’Ordre national, diplôme de spécialisation ou attestation d’exercice hospitalier.',
+    montant: 30000,
+    prixAffiche: '30 000',
     devise: 'FCFA',
-    condition: null,
-    defaultProfession: 'Visiteur / Délégué Institutionnel',
-    matchedProfessions: ['Visiteur / Délégué Institutionnel']
+    condition: null
   },
   {
-    id: 'cat-e',
-    code: 'Jeunes Chercheurs',
+    id: 'general-practitioners',
+    code: 'Catégorie 03',
+    badgeStyle: 'bg-emerald-50 text-[#00765a]',
+    icon: Stethoscope,
+    iconColor: 'text-[#00765a]',
+    titre: 'Médecins généralistes / Résidents / Ingénieurs médico-sanitaires',
+    description:
+      'Médecins généralistes, médecins en cours de spécialisation (résidents) et ingénieurs médico-sanitaires.',
+    justificatifAttendu:
+      'Carte de l’Ordre, attestation de résidanat ou carte professionnelle médico-sanitaire.',
+    montant: 25000,
+    prixAffiche: '25 000',
+    devise: 'FCFA',
+    condition: null
+  },
+  {
+    id: 'technical-nurses',
+    code: 'Catégorie 04',
+    badgeStyle: 'bg-sky-50 text-sky-800',
+    icon: Wrench,
+    iconColor: 'text-sky-700',
+    titre: 'Ingénieurs techniques, Infirmiers, Techniciens médico-sanitaires',
+    description:
+      'Ingénieurs techniques, personnel infirmier, sages-femmes et techniciens médico-sanitaires de laboratoire ou de soins.',
+    justificatifAttendu:
+      'Carte professionnelle, badge d’établissement hospitalier ou attestation de service.',
+    montant: 20000,
+    prixAffiche: '20 000',
+    devise: 'FCFA',
+    condition: null
+  },
+  {
+    id: 'students',
+    code: 'Catégorie 05',
     badgeStyle: 'bg-emerald-50 text-[#00765a]',
     icon: School,
     iconColor: 'text-[#00765a]',
-    titre: 'Étudiant & Interne en Médecine',
+    titre: 'Étudiants',
     description:
-      'Étudiants en facultés de médecine, pharmacie, sciences biomédicales et écoles de soins.',
-    prix: '5 000',
+      'Étudiants inscrits en facultés de médecine, pharmacie, sciences biomédicales et écoles de formation sanitaire.',
+    justificatifAttendu:
+      'Carte d’étudiant en cours de validité ou certificat de scolarité 2026-2027.',
+    montant: 10000,
+    prixAffiche: '10 000',
     devise: 'FCFA',
-    condition: "Présentation obligatoire d'un justificatif ou carte d'étudiant",
-    defaultProfession: 'Étudiant / Interne en Médecine',
-    matchedProfessions: ['Étudiant / Interne en Médecine']
+    condition: 'Carte d’étudiant ou certificat de scolarité requis'
   },
   {
-    id: 'cat-f',
-    code: 'Protocolaire',
-    badgeStyle: 'bg-[#1a1a1a]/10 text-[#1a1a1a]',
-    icon: Award,
-    iconColor: 'text-[#c11236]',
-    titre: "Invité d'Honneur & Conférencier Clé",
+    id: 'patients-association',
+    code: 'Catégorie 06',
+    badgeStyle: 'bg-amber-50 text-amber-900',
+    icon: HeartHandshake,
+    iconColor: 'text-amber-700',
+    titre: 'Associations de patients',
     description:
-      "Personnalités ministérielles, experts désignés de l'OMS et présidents de sociétés savantes.",
-    prix: 'Gratuit',
-    devise: null,
-    condition: "Sur invitation officielle émise par le comité d'organisation",
-    defaultProfession: null,
-    matchedProfessions: []
+      'Membres et représentants d’associations de lutte contre la drépanocytose et d’accompagnement des familles.',
+    justificatifAttendu:
+      'Carte de membre ou attestation signée par le président d’une association reconnue.',
+    montant: 5000,
+    prixAffiche: '5 000',
+    devise: 'FCFA',
+    condition: 'Justificatif d’appartenance associative'
   }
+];
+
+const TARIFS = Object.fromEntries(
+  CATEGORIES_TARIFS.map((cat) => [cat.titre, cat.montant])
+);
+
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 Mo
+const ALLOWED_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp'
 ];
 
 function Inscription() {
   const navigate = useNavigate();
   const [selectedProfession, setSelectedProfession] = useState('');
+  const [justificatif, setJustificatif] = useState(null);
+  const [fileError, setFileError] = useState('');
 
-  const montantActuel = selectedProfession ? TARIFS[selectedProfession] || 0 : null;
+  const categorieActive = CATEGORIES_TARIFS.find(
+    (c) => c.titre === selectedProfession
+  );
+  const montantActuel = categorieActive ? categorieActive.montant : null;
 
   const handleSelectTarif = (professionValue) => {
     if (!professionValue) return;
@@ -143,28 +152,82 @@ function Inscription() {
     }
   };
 
+  const handleFileChange = (e) => {
+    setFileError('');
+    const file = e.target.files?.[0];
+    if (!file) {
+      setJustificatif(null);
+      return;
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFileError(
+        'Format non autorisé. Veuillez joindre un fichier PDF, JPG ou PNG.'
+      );
+      e.target.value = '';
+      setJustificatif(null);
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError(
+        'Fichier trop volumineux (maximum 4 Mo). Compressez votre image ou PDF.'
+      );
+      e.target.value = '';
+      setJustificatif(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Data = String(reader.result || '').split(',')[1] || '';
+      setJustificatif({
+        fileName: file.name,
+        mimeType: file.type,
+        fileSize: file.size,
+        fileBase64: base64Data
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = () => {
+    setJustificatif(null);
+    setFileError('');
+    const input = document.getElementById('reg-proof');
+    if (input) input.value = '';
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const form = e.target;
 
+    if (!justificatif) {
+      setFileError(
+        'Veuillez obligatoirement joindre votre justificatif professionnel (PDF ou image).'
+      );
+      return;
+    }
+
+    const form = e.currentTarget;
     const profession = form.elements['reg-profession'].value;
-    const prixAPayer = TARIFS[profession] || 0;
+    const prixAPayer = TARIFS[profession] ?? 0;
 
     const formData = {
-      noms: form.elements['reg-lastname'].value,
+      noms: form.elements['reg-lastname'].value.trim(),
+      prenoms: form.elements['reg-firstname'].value.trim(),
+      email: form.elements['reg-email'].value.trim(),
+      telephone: form.elements['reg-phone'].value.trim(),
       titre: form.elements['reg-title'].value,
+      profession,
       statut: form.elements['reg-quality'].value,
-      email: form.elements['reg-email'].value,
-      prenoms: form.elements['reg-firstname'].value,
-      profession: profession,
-      institution: form.elements['reg-institution'].value,
-      telephone: form.elements['reg-phone'].value
+      institution: form.elements['reg-institution'].value.trim()
     };
 
     navigate('/paiement', {
       state: {
         donneesInscription: formData,
-        montant: prixAPayer
+        montant: prixAPayer,
+        justificatif
       }
     });
   };
@@ -269,7 +332,7 @@ function Inscription() {
         </div>
       </header>
 
-      {/* 2. BARÈME TARIFAIRE OFFICIEL (DISPOSITION INSTITUTIONNELLE STRUCTURÉE) */}
+      {/* 2. BARÈME TARIFAIRE OFFICIEL */}
       <section className="relative w-full bg-[#f8f8fa] border-b border-[#dce0e8] py-16 lg:py-20 overflow-hidden">
         <div
           aria-hidden="true"
@@ -300,7 +363,6 @@ function Inscription() {
         </div>
 
         <div className="max-w-6xl mx-auto px-6 lg:px-12 relative z-10 space-y-10">
-          {/* En-tête de section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-mono text-[#00765a] font-bold uppercase tracking-wider mb-1.5">
@@ -312,7 +374,7 @@ function Inscription() {
               </h2>
               <p className="text-sm sm:text-base text-[#555555] mt-2 max-w-2xl">
                 Sélectionnez votre catégorie professionnelle ci-dessous pour
-                pré-remplir le formulaire d'accréditation.
+                pré-remplir automatiquement le formulaire d'accréditation.
               </p>
             </div>
 
@@ -321,9 +383,7 @@ function Inscription() {
             </div>
           </div>
 
-          {/* Tableau éditorial des tarifs */}
           <div className="bg-white rounded-3xl border border-[#dce0e8] shadow-xs overflow-hidden">
-            {/* En-tête des colonnes sur écran moyen et grand */}
             <div className="hidden md:grid md:grid-cols-12 gap-6 px-8 py-4 bg-[#f8f8fa] border-b border-[#dce0e8] text-[11px] font-mono uppercase tracking-wider text-[#555555] font-semibold">
               <div className="col-span-7">Catégorie &amp; Profil concerné</div>
               <div className="col-span-3 text-right">Droits d'inscription</div>
@@ -333,32 +393,21 @@ function Inscription() {
             <div className="divide-y divide-[#dce0e8]/80">
               {CATEGORIES_TARIFS.map((cat) => {
                 const IconComponent = cat.icon;
-                const isSelected =
-                  selectedProfession !== '' &&
-                  cat.matchedProfessions.includes(selectedProfession);
+                const isSelected = selectedProfession === cat.titre;
 
                 return (
                   <div
                     key={cat.id}
-                    onClick={() =>
-                      cat.defaultProfession &&
-                      handleSelectTarif(cat.defaultProfession)
-                    }
-                    className={`px-6 sm:px-8 py-6 transition-colors relative ${
-                      cat.defaultProfession ? 'cursor-pointer' : ''
-                    } ${
-                      isSelected
-                        ? 'bg-red-50/40'
-                        : 'hover:bg-[#f8f8fa]/80'
+                    onClick={() => handleSelectTarif(cat.titre)}
+                    className={`px-6 sm:px-8 py-6 transition-colors relative cursor-pointer ${
+                      isSelected ? 'bg-red-50/40' : 'hover:bg-[#f8f8fa]/80'
                     }`}
                   >
-                    {/* Liseré carmin actif à gauche */}
                     {isSelected && (
                       <div className="absolute top-0 left-0 w-1.5 h-full bg-[#c11236]" />
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-center">
-                      {/* Colonne 1 : Identification & Profil */}
                       <div className="md:col-span-7 flex items-start gap-4">
                         <div
                           className={`w-10 h-10 rounded-xl border border-[#dce0e8] bg-[#f8f8fa] flex items-center justify-center shrink-0 mt-0.5 ${cat.iconColor}`}
@@ -390,56 +439,43 @@ function Inscription() {
                         </div>
                       </div>
 
-                      {/* Colonne 2 & 3 : Tarif + Bouton d'action */}
                       <div className="md:col-span-5 flex items-center justify-between md:justify-end gap-6 pt-3 md:pt-0 border-t md:border-t-0 border-[#dce0e8]/60">
                         <div className="md:text-right">
                           <div className="flex items-baseline md:justify-end gap-1.5">
-                            <span
-                              className={`font-mono text-2xl sm:text-[1.65rem] font-bold tabular-nums ${
-                                cat.devise ? 'text-[#1a1a1a]' : 'text-[#00765a]'
-                              }`}
-                            >
-                              {cat.prix}
+                            <span className="font-mono text-2xl sm:text-[1.65rem] font-bold tabular-nums text-[#1a1a1a]">
+                              {cat.prixAffiche}
                             </span>
-                            {cat.devise && (
-                              <span className="text-xs font-mono font-bold text-[#c11236]">
-                                {cat.devise}
-                              </span>
-                            )}
+                            <span className="text-xs font-mono font-bold text-[#c11236]">
+                              {cat.devise}
+                            </span>
                           </div>
                         </div>
 
                         <div className="w-32 flex justify-end shrink-0">
-                          {cat.defaultProfession ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectTarif(cat.defaultProfession);
-                              }}
-                              className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-[#c11236] text-white shadow-xs'
-                                  : 'bg-white border border-[#dce0e8] hover:border-[#c11236] hover:bg-[#c11236] text-[#1a1a1a] hover:text-white'
-                              }`}
-                            >
-                              {isSelected ? (
-                                <>
-                                  <Check className="w-3.5 h-3.5" />
-                                  <span>Sélectionné</span>
-                                </>
-                              ) : (
-                                <>
-                                  <span>Choisir</span>
-                                  <ArrowRight className="w-3.5 h-3.5" />
-                                </>
-                              )}
-                            </button>
-                          ) : (
-                            <span className="text-xs font-mono text-[#555555]/70">
-                              Sur invitation
-                            </span>
-                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectTarif(cat.titre);
+                            }}
+                            className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#c11236] text-white shadow-xs'
+                                : 'bg-white border border-[#dce0e8] hover:border-[#c11236] hover:bg-[#c11236] text-[#1a1a1a] hover:text-white'
+                            }`}
+                          >
+                            {isSelected ? (
+                              <>
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Sélectionné</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>Choisir</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                              </>
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -482,197 +518,297 @@ function Inscription() {
                 Formulaire d'inscription individuelle
               </h2>
               <p className="text-sm sm:text-base text-[#555555] mt-2">
-                Renseignez vos coordonnées pour enregistrer votre badge officiel
-                et procéder au règlement sécurisé.
+                Renseignez vos coordonnées et joignez votre justificatif
+                professionnel pour enregistrer votre badge officiel.
               </p>
             </div>
 
             <form className="space-y-8" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Colonne 1 */}
-                <div className="space-y-5">
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-lastname"
-                    >
-                      Noms <span className="text-[#c11236]">*</span>
-                    </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                {/* 1. Noms */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-lastname"
+                  >
+                    Noms <span className="text-[#c11236]">*</span>
+                  </label>
+                  <input
+                    id="reg-lastname"
+                    type="text"
+                    required
+                    placeholder="ex. Tchamba"
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  />
+                </div>
+
+                {/* 2. Prénoms */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-firstname"
+                  >
+                    Prénoms <span className="text-[#c11236]">*</span>
+                  </label>
+                  <input
+                    id="reg-firstname"
+                    type="text"
+                    required
+                    placeholder="ex. Emilienne"
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  />
+                </div>
+
+                {/* 3. Adresse e-mail */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-email"
+                  >
+                    Adresse e-mail <span className="text-[#c11236]">*</span>
+                  </label>
+                  <input
+                    id="reg-email"
+                    type="email"
+                    required
+                    placeholder="dr.nom@hopital.cm"
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  />
+                </div>
+
+                {/* 4. Numéro de téléphone */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-phone"
+                  >
+                    Numéro de téléphone <span className="text-[#c11236]">*</span>
+                  </label>
+                  <input
+                    id="reg-phone"
+                    type="tel"
+                    required
+                    placeholder="ex. 694 12 64 61"
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  />
+                </div>
+
+                {/* 5. Titre honorifique */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-title"
+                  >
+                    Titre honorifique <span className="text-[#c11236]">*</span>
+                  </label>
+                  <select
+                    id="reg-title"
+                    required
+                    defaultValue=""
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  >
+                    <option disabled value="">
+                      Sélectionnez un titre
+                    </option>
+                    <option value="Pr. (Professeur)">Pr. (Professeur)</option>
+                    <option value="Dr. (Docteur)">Dr. (Docteur)</option>
+                    <option value="M. (Monsieur)">M. (Monsieur)</option>
+                    <option value="Mme (Madame)">Mme (Madame)</option>
+                  </select>
+                </div>
+
+                {/* 6. Catégorie professionnelle */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-profession"
+                  >
+                    Catégorie professionnelle{' '}
+                    <span className="text-[#c11236]">*</span>
+                  </label>
+                  <select
+                    id="reg-profession"
+                    required
+                    value={selectedProfession}
+                    onChange={(e) => setSelectedProfession(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  >
+                    <option disabled value="">
+                      Sélectionnez votre catégorie
+                    </option>
+                    {CATEGORIES_TARIFS.map((cat) => (
+                      <option key={cat.id} value={cat.titre}>
+                        {cat.titre} — {cat.prixAffiche} {cat.devise}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 7. Qualité de participation */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-quality"
+                  >
+                    Vous participez en qualité de{' '}
+                    <span className="text-[#c11236]">*</span>
+                  </label>
+                  <select
+                    id="reg-quality"
+                    required
+                    defaultValue=""
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  >
+                    <option disabled value="">
+                      Choisir un statut
+                    </option>
+                    <option value="Participant">Participant</option>
+                    <option value="Exposant médical">Exposant médical</option>
+                    <option value="Sponsor & Partenaire">
+                      Sponsor &amp; Partenaire
+                    </option>
+                  </select>
+                </div>
+
+                {/* 8. Organisation / Institution */}
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-institution"
+                  >
+                    Organisation / Institution{' '}
+                    <span className="text-[#c11236]">*</span>
+                  </label>
+                  <input
+                    id="reg-institution"
+                    type="text"
+                    required
+                    placeholder="ex. CHUY, FMSB Yaoundé, Hôpital Laquintinie..."
+                    className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* 9. Justificatif professionnel obligatoire (Image ou PDF) */}
+              <div className="space-y-2.5 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <label
+                    className="block text-sm text-[#1a1a1a] font-semibold"
+                    htmlFor="reg-proof"
+                  >
+                    Justificatif de statut / profession (PDF ou Image){' '}
+                    <span className="text-[#c11236]">*</span>
+                  </label>
+                  <span className="text-[11px] font-mono text-[#555555]">
+                    PDF, JPG, PNG · Max 4 Mo
+                  </span>
+                </div>
+
+                {categorieActive && (
+                  <p className="text-xs text-[#00765a] bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3.5 py-2">
+                    <strong>Document attendu :</strong>{' '}
+                    {categorieActive.justificatifAttendu}
+                  </p>
+                )}
+
+                {!justificatif ? (
+                  <label
+                    htmlFor="reg-proof"
+                    className="flex flex-col items-center justify-center gap-2 p-6 rounded-2xl border-2 border-dashed border-[#dce0e8] hover:border-[#c11236] bg-[#f8f8fa] hover:bg-red-50/20 cursor-pointer transition-colors text-center"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white border border-[#dce0e8] flex items-center justify-center text-[#8b0a1d]">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <div className="text-sm font-semibold text-[#1a1a1a]">
+                      Cliquez pour téléverser votre pièce justificative
+                    </div>
+                    <p className="text-xs text-[#555555] max-w-md">
+                      Carte professionnelle, carte d’étudiant, attestation de
+                      service ou d’association de patients (format PDF ou photo
+                      lisible).
+                    </p>
                     <input
-                      id="reg-lastname"
-                      type="text"
-                      required
-                      placeholder="ex. Tchamba"
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
+                      id="reg-proof"
+                      type="file"
+                      accept=".pdf,image/jpeg,image/png,image/webp"
+                      onChange={handleFileChange}
+                      className="sr-only"
                     />
-                  </div>
+                  </label>
+                ) : (
+                  <div className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-emerald-200 flex items-center justify-center text-[#00765a] shrink-0">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-[#1a1a1a] truncate">
+                          {justificatif.fileName}
+                        </p>
+                        <p className="text-xs text-[#00765a]">
+                          {(justificatif.fileSize / 1024).toFixed(0)} Ko · Prêt
+                          pour archivage
+                        </p>
+                      </div>
+                    </div>
 
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-title"
+                    <button
+                      type="button"
+                      onClick={removeFile}
+                      className="p-2 rounded-lg text-[#555555] hover:text-[#c11236] hover:bg-white transition-colors cursor-pointer"
+                      title="Retirer le fichier"
                     >
-                      Titre honorifique{' '}
-                      <span className="text-[#c11236]">*</span>
-                    </label>
-                    <select
-                      id="reg-title"
-                      required
-                      defaultValue=""
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    >
-                      <option disabled value="">
-                        Sélectionnez un titre
-                      </option>
-                      <option value="Pr. (Professeur)">Pr. (Professeur)</option>
-                      <option value="Dr. (Docteur)">Dr. (Docteur)</option>
-                      <option value="M. (Monsieur)">M. (Monsieur)</option>
-                      <option value="Mme (Madame)">Mme (Madame)</option>
-                    </select>
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
+                )}
 
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-quality"
-                    >
-                      Vous participez en qualité de{' '}
-                      <span className="text-[#c11236]">*</span>
-                    </label>
-                    <select
-                      id="reg-quality"
-                      required
-                      defaultValue=""
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    >
-                      <option disabled value="">
-                        Choisir un statut
-                      </option>
-                      <option value="Participant">Participant</option>
-                      <option value="Exposant médical">Exposant médical</option>
-                      <option value="Sponsor & Partenaire">
-                        Sponsor &amp; Partenaire
-                      </option>
-                    </select>
-                  </div>
+                {fileError && (
+                  <p className="text-xs font-semibold text-[#c11236]">
+                    {fileError}
+                  </p>
+                )}
+              </div>
 
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-email"
-                    >
-                      Adresse e-mail institutionnelle{' '}
-                      <span className="text-[#c11236]">*</span>
-                    </label>
-                    <input
-                      id="reg-email"
-                      type="email"
-                      required
-                      placeholder="dr.nom@hopital.cm"
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    />
+              {/* Avertissement dissuasif officiel & déclaration sur l'honneur */}
+              <div className="rounded-2xl bg-[#8b0a1d]/[0.04] border border-[#8b0a1d]/25 p-4 sm:p-5 space-y-3">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-[#c11236] shrink-0 mt-0.5" />
+                  <div className="text-xs sm:text-sm text-[#1a1a1a] leading-relaxed">
+                    <strong className="text-[#8b0a1d] block mb-1">
+                      Clause de contrôle des justificatifs et de
+                      non-remboursement :
+                    </strong>
+                    Le tarif appliqué dépend strictement de votre catégorie
+                    professionnelle réelle. Tout dossier comportant une{' '}
+                    <strong>fausse déclaration de statut</strong> ou un{' '}
+                    <strong>justificatif non conforme</strong> entraînera{' '}
+                    <strong>
+                      l’annulation immédiate de votre accréditation
+                    </strong>{' '}
+                    lors du contrôle à l’entrée du Palais des Congrès.{' '}
+                    <strong>
+                      Aucun remboursement des sommes déjà versées ne sera
+                      effectué
+                    </strong>
+                    , et l’accès aux salles sera subordonné au paiement intégral
+                    de la différence au tarif plein.
                   </div>
                 </div>
 
-                {/* Colonne 2 */}
-                <div className="space-y-5">
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-firstname"
-                    >
-                      Prénoms <span className="text-[#c11236]">*</span>
-                    </label>
-                    <input
-                      id="reg-firstname"
-                      type="text"
-                      required
-                      placeholder="ex. Emilienne"
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-profession"
-                    >
-                      Profession <span className="text-[#c11236]">*</span>
-                    </label>
-                    <select
-                      id="reg-profession"
-                      required
-                      value={selectedProfession}
-                      onChange={(e) => setSelectedProfession(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    >
-                      <option disabled value="">
-                        Sélectionnez votre profession
-                      </option>
-                      <option value="Médecin (Spécialiste ou Généraliste)">
-                        Médecin (Spécialiste ou Généraliste)
-                      </option>
-                      <option value="Infirmier /Soignant">
-                        Infirmier / Soignant
-                      </option>
-                      <option value="Pharmacien hospitalier /officine">
-                        Pharmacien hospitalier / officine
-                      </option>
-                      <option value="Techinicien de laboratoire">
-                        Technicien de laboratoire
-                      </option>
-                      <option value="Chercheur / Généticien">
-                        Chercheur / Généticien
-                      </option>
-                      <option value="Enseignant Universitaire">
-                        Enseignant Universitaire
-                      </option>
-                      <option value="Visiteur / Délégué Institutionnel">
-                        Visiteur / Délégué Institutionnel
-                      </option>
-                      <option value="Étudiant / Interne en Médecine">
-                        Étudiant / Interne en Médecine
-                      </option>
-                      <option value="Autre profession de santé">
-                        Autre profession de santé
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-institution"
-                    >
-                      Organisation / Institution{' '}
-                      <span className="text-[#c11236]">*</span>
-                    </label>
-                    <input
-                      id="reg-institution"
-                      type="text"
-                      required
-                      placeholder="ex. CHUY, FMSB Yaoundé, Hôpital Laquintinie..."
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label
-                      className="block text-sm text-[#1a1a1a] font-semibold"
-                      htmlFor="reg-phone"
-                    >
-                      Numéro de téléphone{' '}
-                      <span className="text-[#c11236]">*</span>
-                    </label>
-                    <input
-                      id="reg-phone"
-                      type="tel"
-                      required
-                      placeholder="ex. 690000000"
-                      className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
-                    />
-                  </div>
-                </div>
+                <label className="flex items-start gap-3 pt-2 border-t border-[#8b0a1d]/15 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    className="mt-0.5 h-4 w-4 rounded border-[#dce0e8] accent-[#8b0a1d] cursor-pointer"
+                  />
+                  <span className="text-xs font-medium text-[#1a1a1a] leading-relaxed">
+                    Je certifie sur l’honneur l’exactitude de ma catégorie
+                    professionnelle ainsi que l’authenticité du justificatif
+                    joint, et j’accepte la clause de non-remboursement en cas de
+                    fausse déclaration. <span className="text-[#c11236]">*</span>
+                  </span>
+                </label>
               </div>
 
               {/* Récapitulatif dynamique du tarif sélectionné */}

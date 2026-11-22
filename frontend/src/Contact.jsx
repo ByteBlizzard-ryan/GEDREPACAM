@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Home,
@@ -16,19 +16,49 @@ import {
   User,
   Send,
   Lock,
-  CheckCircle2,
   Award,
   FileText,
   Globe
 } from 'lucide-react';
 
-function Contact() {
-  const [successBanner, setSuccessBanner] = useState(false);
+const OFFICIAL_EMAIL = 'gedrepacam237@gmail.com';
 
+const SUBJECT_LABELS = {
+  inscription: 'Inscription & Accréditation',
+  soumission: 'Soumission de résumé scientifique',
+  sponsoring: 'Sponsoring & Partenariat institutionnel',
+  autre: 'Autre demande'
+};
+
+function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSuccessBanner(true);
-    e.target.reset();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const fullname = String(formData.get('fullname') || '').trim();
+    const email = String(formData.get('email') || '').trim();
+    const subjectKey = String(formData.get('subject') || '').trim();
+    const message = String(formData.get('message') || '').trim();
+    const subjectLabel = SUBJECT_LABELS[subjectKey] || 'Demande en ligne';
+
+    const emailSubject = `[GEDREPACAM 2027] ${subjectLabel} — ${fullname}`;
+    const emailBody = [
+      'Bonjour le secrétariat GEDREPACAM,',
+      '',
+      `Nom complet : ${fullname}`,
+      `Email de contact : ${email}`,
+      `Objet : ${subjectLabel}`,
+      '',
+      'Message :',
+      message
+    ].join('\n');
+
+    const mailtoUrl = `mailto:${OFFICIAL_EMAIL}?subject=${encodeURIComponent(
+      emailSubject
+    )}&body=${encodeURIComponent(emailBody)}`;
+
+    window.location.href = mailtoUrl;
   };
 
   return (
@@ -183,7 +213,7 @@ function Contact() {
                   </div>
                   <div className="flex flex-col gap-1.5 min-w-0">
                     <span className="text-[10px] font-mono uppercase tracking-wider text-[#00765a] font-bold">
-                      Courrier électronique
+                      Courrier électronique &amp; Portail
                     </span>
                     <h2 className="font-editorial-serif text-xl font-bold text-[#1a1a1a]">
                       Secrétariat d’organisation
@@ -194,18 +224,20 @@ function Contact() {
                     </p>
                     <div className="pt-2 flex flex-col gap-1.5">
                       <a
-                        className="text-sm font-bold text-[#8b0a1d] hover:text-[#c11236] transition-colors inline-flex items-center gap-2"
-                        href="mailto:example@gmail.com"
+                        className="text-sm font-bold text-[#8b0a1d] hover:text-[#c11236] transition-colors inline-flex items-center gap-2 break-all"
+                        href="mailto:gedrepacam237@gmail.com"
                       >
                         <AtSign className="w-4 h-4 shrink-0" />
-                        <span>example@gmail.com</span>
+                        <span>gedrepacam237@gmail.com</span>
                       </a>
                       <a
                         className="text-sm font-medium text-[#555555] hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2"
-                        href="mailto:example@gmail.com"
+                        href="https://www.gedrepacam.cm"
+                        rel="noopener noreferrer"
+                        target="_blank"
                       >
-                        <Inbox className="w-4 h-4 shrink-0 text-[#00765a]" />
-                        <span>example@gmail.com</span>
+                        <Globe className="w-4 h-4 shrink-0 text-[#00765a]" />
+                        <span>www.gedrepacam.cm</span>
                       </a>
                     </div>
                   </div>
@@ -232,17 +264,17 @@ function Contact() {
                     <div className="pt-2 flex flex-col gap-1.5">
                       <a
                         className="text-sm font-bold text-[#1a1a1a] hover:text-[#c11236] transition-colors inline-flex items-center gap-2 font-mono"
-                        href="tel:+237690000000"
+                        href="tel:+237694126461"
                       >
                         <Phone className="w-4 h-4 text-[#8b0a1d] shrink-0" />
-                        <span>+237 690 00 00 00</span>
+                        <span>+237 694 12 64 61</span>
                       </a>
                       <a
                         className="text-sm font-bold text-[#1a1a1a] hover:text-[#c11236] transition-colors inline-flex items-center gap-2 font-mono"
-                        href="tel:+237699002525"
+                        href="tel:+237677489614"
                       >
                         <Smartphone className="w-4 h-4 text-[#00765a] shrink-0" />
-                        <span>+237 690 00 00 00</span>
+                        <span>+237 677 48 96 14</span>
                       </a>
                       <div className="flex items-center gap-2 text-[#555555] text-xs pt-1.5 border-t border-[#dce0e8]/70 mt-1">
                         <Calendar className="w-3.5 h-3.5 text-[#00765a] shrink-0" />
@@ -273,7 +305,7 @@ function Contact() {
                   </p>
                   <div className="pt-1 flex items-center gap-1.5 text-[#00765a] text-xs font-semibold">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
-                    <span>Protocole certifié DREPACAM Yaoundé</span>
+                    <span>Protocole certifié GEDREPACAM Yaoundé</span>
                   </div>
                 </div>
               </div>
@@ -288,14 +320,19 @@ function Contact() {
                 <div className="p-7 sm:p-10">
                   <div className="mb-8">
                     <span className="text-xs font-mono uppercase tracking-wider text-[#c11236] font-bold block mb-1.5">
-                      Formulaire direct
+                      Messagerie directe
                     </span>
                     <h2 className="font-editorial-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a] tracking-tight">
-                      Envoyer une demande en ligne
+                      Préparer votre e-mail au secrétariat
                     </h2>
                     <p className="text-sm text-[#555555] mt-1.5">
-                      Renseignez les informations ci-dessous ; notre cellule de
-                      permanence orientera votre message vers le pôle concerné.
+                      Renseignez les champs ci-dessous : votre application de
+                      messagerie ou votre webmail s’ouvrira automatiquement avec
+                      le message prêt à être envoyé à{' '}
+                      <span className="font-medium text-[#1a1a1a]">
+                        gedrepacam237@gmail.com
+                      </span>
+                      .
                     </p>
                   </div>
 
@@ -315,6 +352,7 @@ function Contact() {
                           <input
                             className="w-full pl-10 pr-4 py-3 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all"
                             id="fullname"
+                            name="fullname"
                             placeholder="Ex: Dr. Martin Eboa"
                             required
                             type="text"
@@ -336,6 +374,7 @@ function Contact() {
                           <input
                             className="w-full pl-10 pr-4 py-3 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all"
                             id="email"
+                            name="email"
                             placeholder="votre.email@institut.cm"
                             required
                             type="email"
@@ -359,6 +398,7 @@ function Contact() {
                           className="w-full pl-10 pr-10 py-3 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 appearance-none cursor-pointer transition-all"
                           defaultValue=""
                           id="subject"
+                          name="subject"
                           required
                         >
                           <option disabled value="">
@@ -391,6 +431,7 @@ function Contact() {
                       <textarea
                         className="w-full p-4 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all min-h-[150px] resize-y"
                         id="message"
+                        name="message"
                         placeholder="Précisez votre demande, votre institution ou vos références de dossier..."
                         required
                         rows="5"
@@ -414,37 +455,21 @@ function Contact() {
                       </label>
                     </div>
 
-                    {/* Bouton d'envoi */}
+                    {/* Bouton d'ouverture de messagerie */}
                     <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <button
                         className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#8b0a1d] hover:bg-[#c11236] text-white text-sm font-bold transition-all shadow-xs flex items-center justify-center gap-2 group cursor-pointer"
                         type="submit"
                       >
-                        <span>Envoyer le message</span>
+                        <span>Ouvrir ma messagerie</span>
                         <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
 
                       <div className="flex items-center gap-1.5 text-[#555555] text-xs font-medium">
                         <Lock className="w-3.5 h-3.5 text-[#00765a] shrink-0" />
-                        <span>Transmission chiffrée TLS</span>
+                        <span>Envoi direct depuis votre boîte mail</span>
                       </div>
                     </div>
-
-                    {successBanner && (
-                      <div className="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-[#00765a] flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-sm font-bold">
-                            Demande transmise avec succès
-                          </span>
-                          <span className="text-xs text-[#00765a]/90 leading-relaxed">
-                            Votre message a bien été enregistré par le
-                            secrétariat GEDREPACAM. Une réponse vous sera
-                            adressée sous 48h ouvrées.
-                          </span>
-                        </div>
-                      </div>
-                    )}
                   </form>
                 </div>
               </div>

@@ -1,10 +1,10 @@
 /**
  * Footer GEDREPACAM 2027 — version compacte harmonisée.
- * Disposition conservée, palette bordeaux/carmin/émeraude et finitions éditoriales.
+ * Disposition 3 colonnes équilibrée (sans newsletter), contacts officiels et patronages actualisés.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, Headset, Clock } from 'lucide-react';
+import { Mail, Phone, Headset, Globe, Clock } from 'lucide-react';
 
 const BORDEAUX = '#8b0a1d';
 const RED = '#c11236';
@@ -21,20 +21,10 @@ const focusRing =
 
 const PATRONAGES = [
   'Ministère de la Santé Publique du Cameroun (MINSANTE)',
-  'Organisation Mondiale de la Santé (OMS / WHO AFRO)',
-  "GEDREPACAM (Groupe d'Étude)",
-  "Société Camerounaise d'Hématologie"
+  "GEDREPACAM (Groupe d'Étude)"
 ];
 
 function Footer() {
-  const [sent, setSent] = useState(false);
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    // TODO : brancher ici votre appel API d'inscription à la newsletter
-    setSent(true);
-  };
-
   const colTitle = 'mb-3 text-[16px] font-bold text-[#1a1a1a]';
 
   return (
@@ -49,7 +39,7 @@ function Footer() {
       />
 
       <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-        <div className="grid gap-8 py-9 sm:grid-cols-2 lg:grid-cols-[1.25fr_1.1fr_1.1fr_1.2fr] lg:gap-10">
+        <div className="grid gap-8 py-9 md:grid-cols-2 lg:grid-cols-[1.3fr_1.1fr_1.2fr] lg:gap-12">
           {/* Lieu */}
           <div>
             <h2
@@ -92,7 +82,7 @@ function Footer() {
           {/* Contacts */}
           <div>
             <h3 className={colTitle} style={SERIF}>
-              Secrétariat et urgences
+              Secrétariat et contacts
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               <li className="flex items-center gap-2.5">
@@ -104,10 +94,10 @@ function Footer() {
                   aria-hidden="true"
                 />
                 <a
-                  href="mailto:example@gmail.com"
+                  href="mailto:gedrepacam237@gmail.com"
                   className={`break-all rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
                 >
-                  example@gmail.com
+                  gedrepacam237@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
@@ -121,10 +111,10 @@ function Footer() {
                 <span>
                   Permanence :{' '}
                   <a
-                    href="tel:+237690000000"
+                    href="tel:+237694126461"
                     className={`rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
                   >
-                    (+237) 690 00 00 00
+                    (+237) 694 12 64 61
                   </a>
                 </span>
               </li>
@@ -139,12 +129,29 @@ function Footer() {
                 <span>
                   Support :{' '}
                   <a
-                    href="tel:+237690000000"
+                    href="tel:+237677489614"
                     className={`rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
                   >
-                    (+237) 690 00 00 00
+                    (+237) 677 48 96 14
                   </a>
                 </span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Globe
+                  size={16}
+                  strokeWidth={2}
+                  className="shrink-0"
+                  style={{ color: GREEN }}
+                  aria-hidden="true"
+                />
+                <a
+                  href="https://www.gedrepacam.cm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`break-all rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
+                >
+                  www.gedrepacam.cm
+                </a>
               </li>
               <li className="flex items-center gap-2.5 text-[#555555]">
                 <Clock
@@ -156,46 +163,6 @@ function Footer() {
                 <span>Lun - Ven, 08h00 - 18h00 (GMT+1)</span>
               </li>
             </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div>
-            <h3 className={colTitle} style={SERIF}>
-              Bulletin scientifique
-            </h3>
-            <p className="mb-3 leading-snug text-[#555555]">
-              Résumés acceptés, programme final et communications orales en avant-première.
-            </p>
-
-            {sent ? (
-              <p
-                role="status"
-                className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-[13px] font-semibold"
-                style={{ color: GREEN }}
-              >
-                Merci, votre inscription est enregistrée.
-              </p>
-            ) : (
-              <form onSubmit={onSubmit} className="flex gap-2">
-                <label htmlFor="newsletter-email" className="sr-only">
-                  Adresse email pour le bulletin scientifique
-                </label>
-                <input
-                  id="newsletter-email"
-                  type="email"
-                  required
-                  placeholder="Votre email médical"
-                  className="min-w-0 flex-1 rounded-full border border-[#dce0e8] bg-[#f8f8fa] px-4 py-2 text-[13px] text-[#1a1a1a] outline-none transition-colors placeholder:text-[#8a8a94] focus:border-[#8b0a1d] focus:bg-white focus:ring-2 focus:ring-[#8b0a1d]/15"
-                />
-                <button
-                  type="submit"
-                  className={`cursor-pointer rounded-full px-4 py-2 text-[13px] font-bold text-white transition-all hover:brightness-95 active:scale-[0.98] ${focusRing}`}
-                  style={{ background: GREEN }}
-                >
-                  S'abonner
-                </button>
-              </form>
-            )}
           </div>
         </div>
 

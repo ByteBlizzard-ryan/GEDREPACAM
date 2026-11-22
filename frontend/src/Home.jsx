@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ShieldCheck,
-  Calendar,
-  MapPin,
   ArrowRight,
+  Clock,
+  Award,
   Newspaper,
   FileText,
   Users
@@ -12,18 +11,10 @@ import {
 
 // Import des images locales depuis ./assets/
 import heroBg from './assets/ImageFondConférence.jpeg';
-// import sponsorMinsante from './assets/sponsor-minsante.jpg';
-// import sponsorOms from './assets/sponsor-oms.jpg';
-// import sponsorSch from './assets/sponsor-sch.jpg';
-// import sponsorFpf from './assets/sponsor-fpf.jpg';
-// import sponsorFmsb from './assets/sponsor-fmsb.jpg';
-// import sponsorCpc from './assets/sponsor-cpc.jpg';
-// import sponsorFed from './assets/sponsor-fed.jpg';
-// import sponsorCac from './assets/sponsor-cac.jpg';
-import logoPad from './assets/pad.png';
-import logoSabc from './assets/sabc.png';
-import logoCnps from './assets/cnps.png';
-
+import logoEbPartner from './assets/eb-partner.jpeg';
+// import logoPad from './assets/pad.png';
+// import logoSabc from './assets/sabc.png';
+// import logoCnps from './assets/cnps.png';
 
 const PILIERS_STRATEGIQUES = [
   {
@@ -122,114 +113,112 @@ const THEMES_SCIENTIFIQUES = [
   }
 ];
 
+// Liste des partenaires classés par niveau : 'or' | 'argent' | 'bronze'
 const PARTENAIRES = [
- {
-    sigle: 'PAD',
-    nom: 'Port Autonome de Douala',
-    sousTitre: 'Sponsor Officiel · Douala, Cameroun',
-    logo: logoPad,
-    cardStyle: 'px-7 py-5 border-2 border-[#00765a]/25 shadow-sm -translate-y-2',
-    badgeStyle: 'w-10 h-10 rounded-full bg-emerald-50 text-[#00765a] text-sm',
-    subStyle: 'text-[11px] text-[#00765a] font-medium'
-  },
   {
-    sigle: 'SABC',
-    nom: 'Boissons du Cameroun',
-    sousTitre: 'Sponsor Officiel · Douala & Yaoundé',
-    logo: logoSabc,
-    cardStyle: 'px-7 py-5 border-2 border-[#c11236]/20 shadow-sm translate-y-3',
-    badgeStyle: 'w-10 h-10 rounded-full bg-[#c11236]/10 text-[#c11236] text-sm',
-    subStyle: 'text-[11px] text-[#c11236] font-medium'
-  },
-  {
-    sigle: 'CNPS',
-    nom: 'Caisse Nationale de Prévoyance Sociale',
-    sousTitre: 'Sponsor Officiel · Protection Sociale',
-    logo: logoCnps,
-    cardStyle: 'px-6 py-4 border border-[#8b0a1d]/25 shadow-xs -translate-y-3',
-    badgeStyle: 'w-9 h-9 rounded-lg bg-[#8b0a1d]/10 text-[#8b0a1d] text-xs',
-    subStyle: 'text-[10px] uppercase tracking-wider text-[#8b0a1d]/80 font-semibold'
-  },
-  // {
-  //   sigle: 'FPF',
-  //   nom: 'Fondation Pierre Fabre',
-  //   sousTitre: 'Partenaire Majeur & Appui Terrain',
-  //   logo: sponsorFpf,
-  //   cardStyle: 'px-7 py-4 border border-[#eae4e4] shadow-xs translate-y-2',
-  //   badgeStyle: 'w-9 h-9 rounded-lg bg-[#edf6f2] text-[#00765a] text-xs',
-  //   subStyle: 'text-[10px] uppercase tracking-wider text-[#555555]/60'
-  // },
-  // {
-  //   sigle: 'FMSB',
-  //   nom: 'Faculté de Médecine',
-  //   sousTitre: 'FMSB · Univ. Yaoundé I',
-  //   logo: sponsorFmsb,
-  //   cardStyle: 'px-6 py-4 border border-[#eae4e4] shadow-xs -translate-y-1',
-  //   badgeStyle: 'w-9 h-9 rounded-lg bg-[#fbf9f8] text-[#1a1a1a] text-xs',
-  //   subStyle: 'text-[10px] uppercase tracking-wider text-[#555555]/60'
-  // },
-  // {
-  //   sigle: 'CPC',
-  //   nom: 'Centre Pasteur du Cameroun',
-  //   sousTitre: 'Biologie & Recherche Clinique',
-  //   logo: sponsorCpc,
-  //   cardStyle: 'px-6 py-4 border border-[#eae4e4] shadow-xs translate-y-3',
-  //   badgeStyle: 'w-9 h-9 rounded-lg bg-[#fbf9f8] text-[#1a1a1a] text-xs',
-  //   subStyle: 'text-[10px] uppercase tracking-wider text-[#555555]/60'
-  // },
-  // {
-  //   sigle: 'FED',
-  //   nom: 'Fédération Drépanocytose',
-  //   sousTitre: 'Coordination des Familles & Usagers',
-  //   logo: sponsorFed,
-  //   cardStyle: 'px-6 py-4 border border-[#eae4e4] shadow-xs -translate-y-2',
-  //   badgeStyle: 'w-9 h-9 rounded-lg bg-[#fbf0f0] text-[#c11236] text-xs',
-  //   subStyle: 'text-[10px] uppercase tracking-wider text-[#555555]/60'
-  // },
-  // {
-  //   sigle: 'CAC',
-  //   nom: 'Consortium Afrique Centrale',
-  //   sousTitre: 'Réseau Scientifique Régional',
-  //   logo: sponsorCac,
-  //   cardStyle: 'px-6 py-4 border border-[#eae4e4] shadow-xs translate-y-1',
-  //   badgeStyle: 'w-9 h-9 rounded-lg bg-[#fbf9f8] text-[#1a1a1a] text-xs',
-  //   subStyle: 'text-[10px] uppercase tracking-wider text-[#555555]/60'
-  // }
+    id: 'eb-partner',
+    categorie: 'bronze',
+    sigle: 'EB-PARTNER',
+    nom: 'EB-Partner',
+    sousTitre: 'Partenaire Officiel · Congrès 2027',
+    logo: logoEbPartner
+  }
 ];
 
-function PartnerBadge({ partner }) {
+// Configuration visuelle distincte pour Or, Argent et Bronze
+const NIVEAUX_PARTENAIRES = [
+  {
+    key: 'or',
+    titre: 'Partenaires Or',
+    badgeLabel: 'Catégorie Or',
+    headerLine: 'from-amber-400 via-yellow-500 to-amber-600',
+    pillStyle:
+      'bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-xs',
+    cardBg:
+      'bg-gradient-to-b from-amber-50/70 via-white to-white border-2 border-amber-400/75 shadow-md shadow-amber-900/5',
+    logoBox:
+      'h-36 sm:h-40 bg-white border border-amber-200/90 rounded-2xl p-5',
+    titleColor: 'text-amber-950',
+    subColor: 'text-amber-800/80',
+    gridCols: 'max-w-3xl mx-auto grid-cols-1 sm:grid-cols-2'
+  },
+  {
+    key: 'argent',
+    titre: 'Partenaires Argent',
+    badgeLabel: 'Catégorie Argent',
+    headerLine: 'from-slate-300 via-slate-400 to-slate-500',
+    pillStyle:
+      'bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-xs',
+    cardBg:
+      'bg-gradient-to-b from-slate-100/80 via-white to-white border-2 border-slate-300/90 shadow-sm',
+    logoBox:
+      'h-28 sm:h-32 bg-white border border-slate-200 rounded-xl p-4',
+    titleColor: 'text-slate-900',
+    subColor: 'text-slate-600',
+    gridCols: 'max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2'
+  },
+  {
+    key: 'bronze',
+    titre: 'Partenaires Bronze',
+    badgeLabel: 'Catégorie Bronze',
+    headerLine: 'from-amber-700 via-orange-700 to-amber-800',
+    pillStyle:
+      'bg-gradient-to-r from-amber-700 to-orange-800 text-white shadow-xs',
+    cardBg:
+      'bg-gradient-to-b from-orange-50/60 via-white to-white border-2 border-orange-300/80 shadow-xs',
+    logoBox:
+      'h-28 sm:h-32 bg-white border border-orange-200/80 rounded-xl p-4',
+    titleColor: 'text-stone-900',
+    subColor: 'text-amber-900/75',
+    gridCols: 'max-w-5xl mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+  }
+];
+
+function PartnerTierCard({ partner, tier }) {
   const [imgFailed, setImgFailed] = useState(false);
 
   return (
-    <div
-      className={`cloud-card bg-white rounded-2xl flex items-center gap-4 ${partner.cardStyle}`}
+    <article
+      className={`rounded-3xl p-6 sm:p-7 flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1 ${tier.cardBg}`}
     >
-      {partner.logo && !imgFailed ? (
-        <div className="w-11 h-11 rounded-xl bg-[#fbf9f8] border border-[#eae4e4] p-1.5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+      {/* Badge de distinction Or / Argent / Bronze */}
+      <span
+        className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-4 ${tier.pillStyle}`}
+      >
+        <Award className="w-3.5 h-3.5" />
+        <span>{tier.badgeLabel}</span>
+      </span>
+
+      {/* Grand conteneur pour le logo */}
+      <div
+        className={`w-full flex items-center justify-center overflow-hidden mb-4 ${tier.logoBox}`}
+      >
+        {partner.logo && !imgFailed ? (
           <img
             src={partner.logo}
             alt={`Logo ${partner.nom}`}
             onError={() => setImgFailed(true)}
-            className="w-full h-full object-contain"
+            className="max-w-full max-h-full w-auto h-auto object-contain"
           />
-        </div>
-      ) : (
-        <div
-          className={`flex items-center justify-center font-editorial-serif font-bold flex-shrink-0 ${partner.badgeStyle}`}
-        >
-          {partner.sigle}
-        </div>
-      )}
-
-      <div className="text-left">
-        <span className="text-xs font-editorial-serif font-bold uppercase tracking-wider text-[#1a1a1a] block">
-          {partner.nom}
-        </span>
-        <span className={`block mt-0.5 ${partner.subStyle}`}>
-          {partner.sousTitre}
-        </span>
+        ) : (
+          <span className="font-editorial-serif text-2xl sm:text-3xl font-bold tracking-wider text-[#1a1a1a]/70">
+            {partner.sigle}
+          </span>
+        )}
       </div>
-    </div>
+
+      {/* Nom et sous-titre */}
+      <h4
+        className={`font-editorial-serif text-lg sm:text-xl font-bold tracking-wide ${tier.titleColor}`}
+      >
+        {partner.nom}
+      </h4>
+      {partner.sousTitre && (
+        <p className={`text-xs font-medium mt-1 ${tier.subColor}`}>
+          {partner.sousTitre}
+        </p>
+      )}
+    </article>
   );
 }
 
@@ -271,301 +260,79 @@ function Home() {
 
   return (
     <main className="w-full bg-[#fcfaf9] text-[#1a1a1a] flex flex-col antialiased selection:bg-[#c11236] selection:text-white">
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION : AFFICHE COMPLÈTE SANS ZOOM + COMPTE À REBOURS EN DESSOUS */}
       <section
         id="hero"
-        className="relative min-h-[920px] w-full flex flex-col justify-between overflow-hidden bg-[#8b0a1d]"
+        className="w-full bg-[#fcfaf9] pt-[88px] lg:pt-[96px]"
       >
-        {/* Image de fond locale ./assets/hero-bg.jpg + overlay dégradé bordeaux/carmin */}
-        <div className="absolute inset-0 z-0">
+        {/* Affiche affichée à 100 % de sa largeur sans rognage ni fond rouge */}
+        <div className="w-full bg-white">
           <img
             src={heroBg}
-            alt="Congrès International de la Drépanocytose - Yaoundé"
-            className="w-full h-full object-cover object-center"
+            alt="5e Congrès International de la Drépanocytose — 25 au 27 mai 2027, Palais des Congrès de Yaoundé"
+            className="w-full h-auto block"
           />
-          <div className="absolute inset-0 hero-overlay-gradient" />
         </div>
 
-        {/* Filigrane décoratif globules rouges & drépanocytes */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none"
-        >
-          <svg
-            className="w-full h-full"
-            preserveAspectRatio="none"
-            viewBox="0 0 1440 960"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <radialGradient cx="38%" cy="38%" id="rbc-hero-grad-1" r="62%">
-                <stop offset="0%" stopColor="#ff9498" stopOpacity="0.35" />
-                <stop offset="50%" stopColor="#ff4d6d" stopOpacity="0.18" />
-                <stop offset="75%" stopColor="#8b0a1d" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#50000d" stopOpacity="0.05" />
-              </radialGradient>
-              <linearGradient
-                id="rbc-hero-sickle-1"
-                x1="0%"
-                x2="100%"
-                y1="0%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="#ff8093" stopOpacity="0.32" />
-                <stop offset="40%" stopColor="#c11236" stopOpacity="0.22" />
-                <stop offset="100%" stopColor="#8b0a1d" stopOpacity="0.05" />
-              </linearGradient>
-              <linearGradient
-                id="rbc-hero-sickle-2"
-                x1="100%"
-                x2="0%"
-                y1="20%"
-                y2="80%"
-              >
-                <stop offset="0%" stopColor="#ffaab6" stopOpacity="0.28" />
-                <stop offset="55%" stopColor="#c11236" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#50000d" stopOpacity="0.02" />
-              </linearGradient>
-              <filter id="blur-ambient">
-                <feGaussianBlur stdDeviation="20" />
-              </filter>
-            </defs>
-            <circle
-              cx="180"
-              cy="280"
-              fill="#c11236"
-              fillOpacity="0.12"
-              filter="url(#blur-ambient)"
-              r="110"
-            />
-            <circle
-              cx="1260"
-              cy="620"
-              fill="#8b0a1d"
-              fillOpacity="0.15"
-              filter="url(#blur-ambient)"
-              r="140"
-            />
-            <g transform="translate(130, 260) rotate(-18)">
-              <ellipse
-                cx="0"
-                cy="0"
-                fill="url(#rbc-hero-grad-1)"
-                rx="52"
-                ry="42"
-              />
-              <ellipse
-                cx="-3"
-                cy="-2"
-                fill="#50000d"
-                fillOpacity="0.22"
-                rx="24"
-                ry="18"
-              />
-              <ellipse
-                cx="-5"
-                cy="-4"
-                fill="#ffffff"
-                fillOpacity="0.12"
-                rx="14"
-                ry="9"
-              />
-            </g>
-            <g transform="translate(210, 480) rotate(32)">
-              <path
-                d="M -15,-65 C 32,-35 48,25 15,65 C 2,75 -8,72 -5,58 C 12,22 8,-20 -22,-52 C -28,-58 -25,-72 -15,-65 Z"
-                fill="url(#rbc-hero-sickle-1)"
-              />
-            </g>
-            <g transform="translate(70, 720) rotate(-35)">
-              <ellipse
-                cx="0"
-                cy="0"
-                fill="url(#rbc-hero-grad-1)"
-                rx="36"
-                ry="28"
-              />
-              <ellipse
-                cx="-2"
-                cy="-1"
-                fill="#50000d"
-                fillOpacity="0.2"
-                rx="16"
-                ry="11"
-              />
-            </g>
-            <g transform="translate(1290, 240) rotate(42)">
-              <ellipse
-                cx="0"
-                cy="0"
-                fill="url(#rbc-hero-grad-1)"
-                rx="68"
-                ry="54"
-              />
-              <ellipse
-                cx="-4"
-                cy="-3"
-                fill="#50000d"
-                fillOpacity="0.24"
-                rx="32"
-                ry="24"
-              />
-              <ellipse
-                cx="-7"
-                cy="-6"
-                fill="#ffffff"
-                fillOpacity="0.15"
-                rx="18"
-                ry="12"
-              />
-            </g>
-            <g transform="translate(1220, 520) rotate(-28)">
-              <path
-                d="M -20,-85 C 40,-45 60,32 18,85 C 4,96 -9,92 -5,76 C 18,30 12,-26 -28,-68 C -36,-76 -32,-94 -20,-85 Z"
-                fill="url(#rbc-hero-sickle-2)"
-              />
-            </g>
-            <g transform="translate(1360, 760) rotate(15)">
-              <ellipse
-                cx="0"
-                cy="0"
-                fill="url(#rbc-hero-grad-1)"
-                rx="40"
-                ry="32"
-              />
-              <ellipse
-                cx="-2"
-                cy="-2"
-                fill="#50000d"
-                fillOpacity="0.18"
-                rx="18"
-                ry="13"
-              />
-            </g>
-            <g transform="translate(320, 140) rotate(12)">
-              <ellipse
-                cx="0"
-                cy="0"
-                fill="url(#rbc-hero-grad-1)"
-                rx="24"
-                ry="19"
-              />
-              <ellipse
-                cx="-1"
-                cy="-1"
-                fill="#50000d"
-                fillOpacity="0.18"
-                rx="10"
-                ry="7"
-              />
-            </g>
-            <g transform="translate(1080, 160) rotate(-45)">
-              <path
-                d="M -10,-42 C 22,-22 32,16 10,42 C 1,48 -5,46 -3,37 C 9,14 6,-13 -14,-34 C -18,-38 -16,-47 -10,-42 Z"
-                fill="url(#rbc-hero-sickle-1)"
-              />
-            </g>
-          </svg>
-        </div>
-
-        {/* Conteneur principal 1440px avec dégagement pour la barre de navigation flottante */}
-        <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 flex flex-col flex-grow justify-between">
-          <div className="pt-28 sm:pt-32 pb-16 flex flex-col items-center text-center max-w-5xl mx-auto">
-            {/* Pastille Pill Institutionnelle */}
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white text-xs sm:text-sm font-medium mb-6 shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-300 flex-shrink-0" />
-              <span>
-                5<sup>e</sup> Congrès International · Sous le Haut Parrainage du
-                Ministre de la Santé Publique
-              </span>
-            </div>
-
-            {/* Titre H1 Majestueux */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-serif-title text-white tracking-tight leading-[1.15] mb-6">
-              Congrès International de la Drépanocytose
-            </h1>
-
-            {/* Bloc Thème Officiel */}
-            <div className="w-full max-w-4xl p-5 sm:p-6 rounded-2xl bg-white/10 border-l-4 border-[#00765a] border-t border-r border-b border-white/20 backdrop-blur-md mb-8">
-              <p className="text-xs uppercase tracking-widest text-emerald-200 font-semibold mb-1">
-                Thème Officiel
-              </p>
-              <p className="font-editorial-serif italic text-lg sm:text-2xl text-white font-normal leading-relaxed">
-                « Accès au dépistage néonatal et à la prise en charge de la
-                drépanocytose : équité, défis, innovations et perspectives »
-              </p>
-            </div>
-
-            {/* Métadonnées : Date & Lieu */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-white/95 text-sm sm:text-base font-medium mb-10">
-              <div className="flex items-center gap-2.5">
-                <span className="p-2 rounded-full bg-white/15 text-white">
-                  <Calendar className="w-5 h-5" />
+        {/* Bandeau inférieur : Compte à rebours + Boutons d'action */}
+        <div className="w-full bg-white border-y border-[#eedcdc]">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 py-5 sm:py-6 flex flex-col lg:flex-row items-center justify-between gap-5">
+            {/* Compte à rebours */}
+            <div className="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-2.5 text-center sm:text-left">
+                <span className="p-2 rounded-full bg-[#00765a]/10 text-[#00765a] hidden sm:inline-flex">
+                  <Clock className="w-4 h-4" />
                 </span>
-                <span>
-                  25 – 27 mai 2027{' '}
-                  <span className="text-white/60 font-normal">
-                    (3 jours de travaux)
-                  </span>
-                </span>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-[#00765a] font-bold">
+                    Compte à rebours
+                  </p>
+                  <p className="text-xs sm:text-sm text-[#555555] font-medium">
+                    Ouverture officielle dans
+                  </p>
+                </div>
               </div>
-
-              <div className="h-4 w-px bg-white/30 hidden sm:block" />
-
-              <div className="flex items-center gap-2.5">
-                <span className="p-2 rounded-full bg-white/15 text-white">
-                  <MapPin className="w-5 h-5" />
-                </span>
-                <span>Palais des Congrès de Yaoundé, Cameroun</span>
-              </div>
-            </div>
-
-            {/* Compte à Rebours Interactif */}
-            <div className="w-full max-w-2xl mb-10">
-              <p className="text-xs uppercase tracking-widest text-white/70 font-semibold mb-3">
-                Ouverture officielle dans
-              </p>
 
               {!timeLeft.isLive ? (
-                <div className="grid grid-cols-4 gap-3 sm:gap-4 text-center tabular-nums">
-                  <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl py-3 px-2 sm:py-4">
-                    <span className="block font-editorial-serif text-2xl sm:text-4xl font-bold text-white tracking-normal">
+                <div className="grid grid-cols-4 gap-2.5 sm:gap-3 text-center tabular-nums w-full sm:w-auto max-w-md">
+                  <div className="bg-[#fcfaf9] border border-[#eedcdc] rounded-xl py-2 px-3 sm:px-4 min-w-[68px] sm:min-w-[78px]">
+                    <span className="block font-editorial-serif text-xl sm:text-2xl font-bold text-[#8b0a1d] leading-none">
                       {String(timeLeft.days).padStart(2, '0')}
                     </span>
-                    <span className="text-[11px] sm:text-xs uppercase tracking-wider text-white/70">
+                    <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
                       Jours
                     </span>
                   </div>
 
-                  <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl py-3 px-2 sm:py-4">
-                    <span className="block font-editorial-serif text-2xl sm:text-4xl font-bold text-white tracking-normal">
+                  <div className="bg-[#fcfaf9] border border-[#eedcdc] rounded-xl py-2 px-3 sm:px-4 min-w-[68px] sm:min-w-[78px]">
+                    <span className="block font-editorial-serif text-xl sm:text-2xl font-bold text-[#8b0a1d] leading-none">
                       {String(timeLeft.hours).padStart(2, '0')}
                     </span>
-                    <span className="text-[11px] sm:text-xs uppercase tracking-wider text-white/70">
+                    <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
                       Heures
                     </span>
                   </div>
 
-                  <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl py-3 px-2 sm:py-4">
-                    <span className="block font-editorial-serif text-2xl sm:text-4xl font-bold text-white tracking-normal">
+                  <div className="bg-[#fcfaf9] border border-[#eedcdc] rounded-xl py-2 px-3 sm:px-4 min-w-[68px] sm:min-w-[78px]">
+                    <span className="block font-editorial-serif text-xl sm:text-2xl font-bold text-[#8b0a1d] leading-none">
                       {String(timeLeft.mins).padStart(2, '0')}
                     </span>
-                    <span className="text-[11px] sm:text-xs uppercase tracking-wider text-white/70">
+                    <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
                       Minutes
                     </span>
                   </div>
 
-                  <div className="bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl py-3 px-2 sm:py-4">
-                    <span className="block font-editorial-serif text-2xl sm:text-4xl font-bold text-white tracking-normal">
+                  <div className="bg-[#fcfaf9] border border-[#eedcdc] rounded-xl py-2 px-3 sm:px-4 min-w-[68px] sm:min-w-[78px]">
+                    <span className="block font-editorial-serif text-xl sm:text-2xl font-bold text-[#c11236] leading-none">
                       {String(timeLeft.secs).padStart(2, '0')}
                     </span>
-                    <span className="text-[11px] sm:text-xs uppercase tracking-wider text-white/70">
+                    <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
                       Secondes
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="py-4 px-6 rounded-2xl bg-white/20 border border-white/30 text-white font-editorial-serif text-xl">
+                <div className="py-2.5 px-5 rounded-xl bg-[#00765a]/10 border border-[#00765a]/25 text-[#00765a] font-editorial-serif font-semibold text-base sm:text-lg">
                   Le 5<sup>e</sup> Congrès International de la Drépanocytose a
                   débuté.
                 </div>
@@ -573,34 +340,24 @@ function Home() {
             </div>
 
             {/* Boutons Call to Action */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <Link
                 to="/inscription"
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#c11236] hover:bg-[#a80e2d] text-white font-semibold text-base transition-all duration-200 shadow-lg shadow-black/20 hover:scale-[1.02]"
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] hover:from-[#7a0818] hover:to-[#a80e2e] text-white font-semibold text-sm transition-all duration-200 shadow-xs hover:scale-[1.02]"
               >
                 <span>S'inscrire au congrès</span>
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
                 to="/programme"
-                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-base border-2 border-white/80 backdrop-blur-sm transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-[#fcfaf9] hover:bg-[#c11236]/[0.05] text-[#1a1a1a] hover:text-[#8b0a1d] font-semibold text-sm border border-[#eedcdc] hover:border-[#c11236]/40 transition-all duration-200"
               >
                 Découvrir le programme
               </Link>
             </div>
           </div>
-
-          {/* Slogan officiel en bas du Hero */}
-          <div className="pb-8 pt-4 border-t border-white/20 text-center">
-            <p className="font-editorial-serif italic text-white/90 text-sm sm:text-base tracking-wide">
-              « Un combat pour l'Espoir, une Victoire pour nos enfants »
-            </p>
-          </div>
         </div>
-
-        {/* Séparateur courbe sobre vers le corps blanc */}
-        <div className="h-6 w-full bg-[#fcfaf9] rounded-t-[32px] relative z-10 -mb-[1px]" />
       </section>
 
       {/* 2. LES 5 AXES FONDAMENTAUX (Bento Éditorial) */}
@@ -1187,7 +944,7 @@ function Home() {
         </div>
       </section>
 
-      {/* 6. PARTENARIATS INSTITUTIONNELS & SCIENTIFIQUES */}
+      {/* 6. PARTENARIATS OR, ARGENT & BRONZE */}
       <section
         id="partenaires"
         className="py-24 bg-[#f8f5f4] border-t border-[#eedcdc] relative overflow-hidden"
@@ -1195,7 +952,7 @@ function Home() {
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs uppercase tracking-[0.25em] text-[#555555]/70 font-semibold mb-3 block">
-              Partenariats Institutionnels &amp; Scientifiques
+              Partenariats Officiels · Or, Argent &amp; Bronze
             </span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif-title font-bold text-[#1a1a1a]">
               Sous le Haut Parrainage du Ministre de la Santé Publique et
@@ -1204,11 +961,63 @@ function Home() {
             <div className="w-12 h-0.5 bg-[#c11236] mx-auto mt-4" />
           </div>
 
-          {/* Constellation organique avec logos depuis ./assets/ */}
-          <div className="relative max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-5 sm:gap-6 lg:gap-8 pt-4 pb-8">
-            {PARTENAIRES.map((partner) => (
-              <PartnerBadge key={partner.sigle} partner={partner} />
-            ))}
+          {/* Trois niveaux bien distincts : Or, Argent, Bronze */}
+          <div className="space-y-16">
+            {NIVEAUX_PARTENAIRES.map((tier) => {
+              const items = PARTENAIRES.filter((p) => p.categorie === tier.key);
+              const activeGridClass =
+                items.length === 1
+                  ? 'max-w-md mx-auto grid-cols-1'
+                  : tier.gridCols;
+
+              return (
+                <div key={tier.key} className="space-y-8">
+                  {/* En-tête métallique de la catégorie */}
+                  <div className="flex items-center justify-center gap-4 max-w-2xl mx-auto">
+                    <span
+                      className={`h-0.5 flex-1 bg-gradient-to-r opacity-40 ${tier.headerLine}`}
+                    />
+                    <h3
+                      className={`text-sm sm:text-base font-editorial-serif font-bold uppercase tracking-[0.22em] ${tier.titleColor}`}
+                    >
+                      {tier.titre}
+                    </h3>
+                    <span
+                      className={`h-0.5 flex-1 bg-gradient-to-l opacity-40 ${tier.headerLine}`}
+                    />
+                  </div>
+
+                  {items.length > 0 ? (
+                    <div className={`grid gap-8 ${activeGridClass}`}>
+                      {items.map((partner) => (
+                        <PartnerTierCard
+                          key={partner.id}
+                          partner={partner}
+                          tier={tier}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="max-w-lg mx-auto">
+                      <div
+                        className={`rounded-2xl border-dashed px-6 py-7 text-center opacity-85 ${tier.cardBg}`}
+                      >
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-2.5 ${tier.pillStyle}`}
+                        >
+                          <Award className="w-3 h-3" />
+                          <span>{tier.badgeLabel}</span>
+                        </span>
+                        <p className={`text-sm font-medium ${tier.subColor}`}>
+                          Liste des {tier.titre.toLowerCase()} en cours
+                          d'officialisation.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

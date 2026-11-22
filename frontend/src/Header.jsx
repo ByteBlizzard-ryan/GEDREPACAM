@@ -10,7 +10,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X,ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import logo from './assets/logo.png';
 
 const RED = '#c11236';
@@ -24,7 +24,8 @@ const LINKS = [
   { to: '/', label: 'Accueil' },
   { to: '/programme', label: 'Programme' },
   { to: '/inscription', label: 'Inscription' },
-  { to: '/informations', label: 'Nos Sponsors & Partenaires' },
+  { to: '/soumettre-resume', label: 'Soumettre un résumé' },
+  { to: '/sponsor', label: 'Nos Sponsors & Partenaires' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -72,7 +73,7 @@ function Header() {
 
       <div className="relative z-20 mx-auto max-w-[1440px] px-3 pt-2 lg:px-6 lg:pt-3">
         <div
-          className={`flex items-center justify-between gap-6 rounded-2xl border border-black/[0.06] bg-white/90 px-4 backdrop-blur-xl transition-all duration-300 lg:px-6 ${
+          className={`flex items-center justify-between gap-4 rounded-2xl border border-black/[0.06] bg-white/90 px-4 backdrop-blur-xl transition-all duration-300 xl:gap-6 lg:px-6 ${
             scrolled
               ? 'py-2 shadow-[0_14px_34px_-14px_rgba(25,20,35,0.28)]'
               : 'py-3 shadow-[0_2px_14px_-8px_rgba(25,20,35,0.14)]'
@@ -88,7 +89,7 @@ function Header() {
             <span className="h-8 w-px bg-black/10" aria-hidden="true" />
             <span className="flex flex-col">
               <span
-                className="text-[19px] font-bold leading-none tracking-[-0.01em] lg:text-[22px]"
+                className="text-[19px] font-bold leading-none tracking-[-0.01em] lg:text-[21px] xl:text-[22px]"
                 style={{ ...SERIF, color: RED }}
               >
                 GEDREPACAM 2027
@@ -104,14 +105,14 @@ function Header() {
 
           {/* Navigation (desktop) */}
           <nav aria-label="Navigation principale" className="hidden flex-1 justify-center lg:flex">
-            <ul className="m-0 flex list-none items-center gap-1 p-0">
+            <ul className="m-0 flex list-none items-center gap-0.5 p-0 xl:gap-1">
               {LINKS.map(({ to, label }) => (
                 <li key={to}>
                   <NavLink
                     to={to}
                     end={to === '/'}
                     className={({ isActive }) =>
-                      `group relative block rounded-md px-3.5 py-2 text-[14.5px] font-semibold transition-colors duration-200 ${focusRing} ${
+                      `group relative block whitespace-nowrap rounded-md px-2.5 py-2 text-[13.5px] font-semibold transition-colors duration-200 xl:px-3.5 xl:text-[14.5px] ${focusRing} ${
                         isActive ? 'text-[#c11236]' : 'text-[#3b3b44] hover:text-[#c11236]'
                       }`
                     }
@@ -121,7 +122,7 @@ function Header() {
                         {label}
                         <span
                           aria-hidden="true"
-                          className={`absolute inset-x-3.5 -bottom-0.5 h-[2px] origin-left rounded-full bg-[#c11236] transition-transform duration-300 ease-out ${
+                          className={`absolute inset-x-2.5 -bottom-0.5 h-[2px] origin-left rounded-full bg-[#c11236] transition-transform duration-300 ease-out xl:inset-x-3.5 ${
                             isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                           }`}
                         />
@@ -134,34 +135,10 @@ function Header() {
           </nav>
 
           {/* Actions (desktop) */}
-          <div className="hidden shrink-0 items-center gap-4 lg:flex">
-            <div className="flex items-center gap-2 text-[13px] font-semibold" role="group" aria-label="Langue">
-              {['FR', 'EN'].map((l, i) => (
-                <React.Fragment key={l}>
-                  {i === 1 && <span className="h-3.5 w-px bg-black/15" aria-hidden="true" />}
-                  <button
-                    type="button"
-                    onClick={() => setLang(l)}
-                    aria-pressed={lang === l}
-                    className={`rounded px-1 py-0.5 transition-colors ${focusRing} ${
-                      lang === l ? 'text-[#c11236]' : 'text-[#8a8a94] hover:text-[#3b3b44]'
-                    }`}
-                  >
-                    {l}
-                  </button>
-                </React.Fragment>
-              ))}
-            </div>
-
-            {/* <button
-              type="button"
-              className={`rounded-full bg-[#c11236] px-5 py-2.5 text-[14px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(193,18,54,0.6)] transition-all duration-200 hover:bg-[#a30e2d] hover:shadow-[0_8px_20px_-6px_rgba(193,18,54,0.7)] active:scale-[0.98] ${focusRing}`}
-            >
-              S'inscrire maintenant
-            </button> */}
-             <Link
+          <div className="hidden shrink-0 items-center gap-3 xl:gap-4 lg:flex">
+            <Link
               to="/inscription"
-              className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-5 py-2.5 text-[13.5px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] ${focusRing}`}
+              className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-4 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] xl:px-5 xl:text-[13.5px] ${focusRing}`}
             >
               <span>S’inscrire maintenant</span>
               <ArrowRight
@@ -170,7 +147,6 @@ function Header() {
                 aria-hidden="true"
               />
             </Link>
-
           </div>
 
           {/* Bouton menu (mobile) */}
@@ -202,7 +178,7 @@ function Header() {
                   to={to}
                   end={to === '/'}
                   className={({ isActive }) =>
-                    `flex items-center justify-between py-4 text-[28px] font-semibold leading-tight tracking-[-0.01em] ${focusRing} ${
+                    `flex items-center justify-between py-4 text-[26px] font-semibold leading-tight tracking-[-0.01em] sm:text-[28px] ${focusRing} ${
                       isActive ? 'text-[#c11236]' : 'text-[#1f1f26]'
                     }`
                   }
@@ -223,17 +199,17 @@ function Header() {
         </nav>
 
         <div className="mt-8 flex flex-col gap-3">
-        <Link
-              to="/inscription"
-              className={`group inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-5 py-2.5 text-[13.5px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] ${focusRing}`}
-            >
-              <span>S’inscrire maintenant</span>
-              <ArrowRight
-                size={15}
-                className="transition-transform duration-200 group-hover:translate-x-0.5"
-                aria-hidden="true"
-              />
-            </Link>
+          <Link
+            to="/inscription"
+            className={`group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] px-5 py-3 text-[14px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(139,10,29,0.55)] transition-all duration-200 hover:from-[#7a0818] hover:to-[#a80e2e] hover:shadow-[0_10px_22px_-6px_rgba(139,10,29,0.65)] active:scale-[0.98] ${focusRing}`}
+          >
+            <span>S’inscrire maintenant</span>
+            <ArrowRight
+              size={15}
+              className="transition-transform duration-200 group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </Link>
 
           <div className="mt-4 flex items-center justify-between">
             <span className="text-[14px] font-medium text-[#6b6b75]">Langue de l'interface</span>
