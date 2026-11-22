@@ -644,7 +644,7 @@ function Inscription() {
                   </select>
                 </div>
 
-                {/* 7. Qualité de participation */}
+               {/* 7. Qualité de participation */}
                 <div className="space-y-1.5">
                   <label
                     className="block text-sm text-[#1a1a1a] font-semibold"
@@ -667,8 +667,10 @@ function Inscription() {
                     <option value="Sponsor & Partenaire">
                       Sponsor &amp; Partenaire
                     </option>
+                    <option value="Intervenant">Intervenant</option>
                   </select>
                 </div>
+
 
                 {/* 8. Organisation / Institution */}
                 <div className="space-y-1.5">
