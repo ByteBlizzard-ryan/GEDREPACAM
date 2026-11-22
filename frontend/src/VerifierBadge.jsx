@@ -18,6 +18,7 @@ function VerifierBadge() {
   const [etatScan, setEtatScan] = useState('LOADING'); // LOADING | VALID | ALREADY_USED | OUT_OF_DATES | INVALID
   const [infoPassage, setInfoPassage] = useState('');
   const [joursPresents, setJoursPresents] = useState(null);
+  const [alerteSynchro, setAlerteSynchro] = useState('');
 
   // Empêche React StrictMode d'exécuter le scan deux fois au montage
   const scanDejaLance = useRef(false);
@@ -45,8 +46,12 @@ function VerifierBadge() {
         return;
       }
 
-      const scriptUrl = import.meta.env.VITE_CHECKIN_SCRIPT_URL;
+      const scriptUrl =
+        import.meta.env.VITE_CHECKIN_SCRIPT_URL ||
+        import.meta.env.VITE_APPS_SCRIPT_URL;
+
       if (!scriptUrl) {
+        setAlerteSynchro("URL du script de pointage non configurée (pointage non enregistré).");
         setEtatScan('VALID');
         return;
       }
@@ -76,7 +81,7 @@ function VerifierBadge() {
         }
       } catch (err) {
         console.error("Erreur de connexion au registre Google Sheets :", err);
-        setInfoPassage("Mode hors-ligne (signature authentifiée)");
+        setAlerteSynchro("Registre Google Sheets injoignable (pointage non enregistré).");
         setEtatScan('VALID');
       }
     };
@@ -99,11 +104,16 @@ function VerifierBadge() {
             <div className="bg-[#00765a] text-white p-6 text-center">
               <CheckCircle2 size={52} className="mx-auto mb-2" />
               <h1 className="text-2xl font-extrabold tracking-tight">ACCÈS AUTORISÉ</h1>
-              <p className="text-xs opacity-90 mt-1">{infoPassage}</p>
+              {infoPassage && <p className="text-xs opacity-90 mt-1">{infoPassage}</p>}
               {joursPresents && (
                 <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-white/20 text-xs font-bold">
                   <CalendarCheck size={14} /> Présence enregistrée : {joursPresents} / 3 jours
                 </span>
+              )}
+              {alerteSynchro && (
+                <p className="mt-3 rounded-lg bg-black/25 px-3 py-1.5 text-[11px] font-semibold text-amber-200">
+                  {alerteSynchro}
+                </p>
               )}
             </div>
             <DetailsParticipant
@@ -221,7 +231,7 @@ function DetailsParticipant({ prenoms, noms, telephone, profession, institution,
         <div className="flex items-center gap-3 text-gray-700">
           <Hash size={18} className="text-[#c11236] shrink-0" />
           <div>
-            <span className="text-xs text-gray-400 block">Référence Transaction Fapshi</span>
+            <span className="text-xs text-gray-400 block">Référence Transaction </span>
             <span className="font-mono font-bold text-[#c11236]">{transId}</span>
           </div>
         </div>
