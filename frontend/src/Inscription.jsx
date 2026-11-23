@@ -18,12 +18,15 @@ import {
   X,
   AlertTriangle
 } from 'lucide-react';
+import { useLang } from './context/LanguageContext';
+import { compresserImage } from './utils/compressImage';
 
 // Grille tarifaire officielle finale en FCFA
 const CATEGORIES_TARIFS = [
   {
     id: 'academics',
     code: 'Catégorie 01',
+    en: { code: 'Category 01', titre: 'Academics (Lecturers / Researchers)', description: 'Teacher-researchers, university professors, senior lecturers and biomedical researchers.', justificatifAttendu: 'Proof of university position, appointment order or teacher-researcher professional card.' },
     badgeStyle: 'bg-[#8b0a1d]/10 text-[#8b0a1d]',
     icon: GraduationCap,
     iconColor: 'text-[#8b0a1d]',
@@ -40,6 +43,7 @@ const CATEGORIES_TARIFS = [
   {
     id: 'specialists',
     code: 'Catégorie 02',
+    en: { code: 'Category 02', titre: 'Medical specialists / Biologists', description: 'Hospital specialists, haematologists, paediatricians, clinical pharmacists and medical biologists.', justificatifAttendu: 'National Medical Council card, specialist diploma or proof of hospital practice.' },
     badgeStyle: 'bg-[#c11236]/10 text-[#c11236]',
     icon: Microscope,
     iconColor: 'text-[#c11236]',
@@ -56,6 +60,7 @@ const CATEGORIES_TARIFS = [
   {
     id: 'general-practitioners',
     code: 'Catégorie 03',
+    en: { code: 'Category 03', titre: 'General practitioners / Residents / Health engineers', description: 'General practitioners, doctors in specialist training (residents) and health engineers.', justificatifAttendu: 'Medical Council card, residency certificate or health professional card.' },
     badgeStyle: 'bg-emerald-50 text-[#00765a]',
     icon: Stethoscope,
     iconColor: 'text-[#00765a]',
@@ -72,6 +77,7 @@ const CATEGORIES_TARIFS = [
   {
     id: 'technical-nurses',
     code: 'Catégorie 04',
+    en: { code: 'Category 04', titre: 'Technical engineers, Nurses, Health technicians', description: 'Technical engineers, nursing staff, midwives and laboratory or care health technicians.', justificatifAttendu: 'Professional card, hospital staff badge or proof of employment.' },
     badgeStyle: 'bg-sky-50 text-sky-800',
     icon: Wrench,
     iconColor: 'text-sky-700',
@@ -88,6 +94,7 @@ const CATEGORIES_TARIFS = [
   {
     id: 'students',
     code: 'Catégorie 05',
+    en: { code: 'Category 05', titre: 'Students', description: 'Students enrolled in medicine, pharmacy, biomedical science faculties and health training schools.', justificatifAttendu: 'Valid student card or 2026-2027 enrolment certificate.', condition: 'Student card or enrolment certificate required' },
     badgeStyle: 'bg-emerald-50 text-[#00765a]',
     icon: School,
     iconColor: 'text-[#00765a]',
@@ -104,6 +111,7 @@ const CATEGORIES_TARIFS = [
   {
     id: 'patients-association',
     code: 'Catégorie 06',
+    en: { code: 'Category 06', titre: 'Patient associations', description: 'Members and representatives of associations fighting sickle cell disease and supporting families.', justificatifAttendu: 'Membership card or certificate signed by the president of a recognised association.', condition: 'Proof of association membership' },
     badgeStyle: 'bg-amber-50 text-amber-900',
     icon: HeartHandshake,
     iconColor: 'text-amber-700',
@@ -123,7 +131,9 @@ const TARIFS = Object.fromEntries(
   CATEGORIES_TARIFS.map((cat) => [cat.titre, cat.montant])
 );
 
-const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 Mo
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 Mo (taille finale envoyée)
+// Une photo plus lourde est acceptée au départ, car elle est compressée avant l'envoi
+const MAX_PHOTO_AVANT_COMPRESSION = 50 * 1024 * 1024; // 50 Mo
 const ALLOWED_TYPES = [
   'application/pdf',
   'image/jpeg',
@@ -137,10 +147,20 @@ function Inscription() {
   const [selectedProfession, setSelectedProfession] = useState('');
   const [justificatif, setJustificatif] = useState(null);
   const [fileError, setFileError] = useState('');
+  const [compressionEnCours, setCompressionEnCours] = useState(false);
+  const { t, pick, lang } = useLang();
 
+  const formaterTaille = (octets) =>
+    octets >= 1024 * 1024
+      ? `${(octets / (1024 * 1024)).toFixed(1)} ${t('Mo', 'MB')}`
+      : `${Math.max(1, Math.round(octets / 1024))} ${t('Ko', 'KB')}`;
+
+  // Les valeurs envoyées (catégorie, titre, statut) restent en français ;
+  // seul l'affichage est traduit.
   const categorieActive = CATEGORIES_TARIFS.find(
     (c) => c.titre === selectedProfession
   );
+  const categorieActiveAffichee = categorieActive ? pick(categorieActive) : null;
   const montantActuel = categorieActive ? categorieActive.montant : null;
 
   const handleSelectTarif = (professionValue) => {
@@ -152,29 +172,49 @@ function Inscription() {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     setFileError('');
-    const file = e.target.files?.[0];
-    if (!file) {
+    const input = e.target;
+    const fichierChoisi = input.files?.[0];
+    if (!fichierChoisi) {
       setJustificatif(null);
       return;
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setFileError(
-        'Format non autorisé. Veuillez joindre un fichier PDF, JPG ou PNG.'
-      );
-      e.target.value = '';
+    const refuser = (message) => {
+      setFileError(message);
+      input.value = '';
       setJustificatif(null);
+    };
+
+    if (!ALLOWED_TYPES.includes(fichierChoisi.type)) {
+      refuser(
+        t('Format non autorisé. Veuillez joindre un fichier PDF, JPG ou PNG.', 'File type not allowed. Please attach a PDF, JPG or PNG file.')
+      );
       return;
+    }
+
+    const estPhoto = fichierChoisi.type.startsWith('image/');
+    if (estPhoto && fichierChoisi.size > MAX_PHOTO_AVANT_COMPRESSION) {
+      refuser(t('Photo trop volumineuse (maximum 50 Mo).', 'Photo too large (maximum 50 MB).'));
+      return;
+    }
+
+    // Les photos sont allégées automatiquement ; les PDF sont envoyés tels quels
+    let file = fichierChoisi;
+    let compressed = false;
+    if (estPhoto) {
+      setCompressionEnCours(true);
+      const resultat = await compresserImage(fichierChoisi);
+      setCompressionEnCours(false);
+      file = resultat.file;
+      compressed = resultat.compressed;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setFileError(
-        'Fichier trop volumineux (maximum 4 Mo). Compressez votre image ou PDF.'
+      refuser(
+        t('Fichier trop volumineux (maximum 15 Mo). Compressez votre image ou PDF.', 'File too large (maximum 15 MB). Please compress your image or PDF.')
       );
-      e.target.value = '';
-      setJustificatif(null);
       return;
     }
 
@@ -185,9 +225,12 @@ function Inscription() {
         fileName: file.name,
         mimeType: file.type,
         fileSize: file.size,
+        originalSize: compressed ? fichierChoisi.size : null,
         fileBase64: base64Data
       });
     };
+    reader.onerror = () =>
+      refuser(t('Impossible de lire ce fichier. Essayez-en un autre.', 'Unable to read this file. Please try another one.'));
     reader.readAsDataURL(file);
   };
 
@@ -203,7 +246,7 @@ function Inscription() {
 
     if (!justificatif) {
       setFileError(
-        'Veuillez obligatoirement joindre votre justificatif professionnel (PDF ou image).'
+        t('Veuillez obligatoirement joindre votre justificatif professionnel (PDF ou image).', 'You must attach your professional supporting document (PDF or image).')
       );
       return;
     }
@@ -275,31 +318,38 @@ function Inscription() {
           <div className="flex flex-wrap items-center gap-2.5 mb-6">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-xs font-medium text-white/90">
               <GraduationCap className="w-3.5 h-3.5 text-white/80" />
-              <span>Attestation CME</span>
+              <span>{t('Attestation CME', 'CME Certificate')}</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/5 text-xs font-medium text-white/90">
               <Microscope className="w-3.5 h-3.5 text-white/80" />
-              <span>Sessions Plénières &amp; Ateliers</span>
+              <span>{t('Sessions Plénières & Ateliers', 'Plenary Sessions & Workshops')}</span>
             </span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-8">
               <span className="text-xs font-mono uppercase tracking-[0.22em] text-white/75 font-semibold block mb-2">
-                GEDREPACAM · 5<sup>e</sup> Édition Internationale
+                {t(
+                  <>GEDREPACAM · 5<sup>e</sup> Édition Internationale</>,
+                  <>GEDREPACAM · 5<sup>th</sup> International Edition</>
+                )}
               </span>
               <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-serif-title font-bold tracking-tight text-white leading-[1.15] mb-4">
-                Inscription au Congrès
+                {t('Inscription au Congrès', 'Congress Registration')}
               </h1>
               <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-3xl">
-                Ouverture des inscriptions :{' '}
-                <strong className="font-semibold text-white">
-                  20 octobre 2026
-                </strong>{' '}
-                — Clôture :{' '}
-                <strong className="font-semibold text-white">Avril 2027</strong>
-                . Rejoignez les experts internationaux, praticiens et chercheurs
-                au Palais des Congrès de Yaoundé.
+                {t(
+                  <>
+                    Ouverture des inscriptions : <strong className="font-semibold text-white">20 octobre 2026</strong>{' '}
+                    — Clôture : <strong className="font-semibold text-white">Avril 2027</strong>. Rejoignez les
+                    experts internationaux, praticiens et chercheurs au Palais des Congrès de Yaoundé.
+                  </>,
+                  <>
+                    Registration opens: <strong className="font-semibold text-white">20 October 2026</strong>{' '}
+                    — Closes: <strong className="font-semibold text-white">April 2027</strong>. Join international
+                    experts, practitioners and researchers at the Yaoundé Conference Centre.
+                  </>
+                )}
               </p>
             </div>
 
@@ -307,9 +357,9 @@ function Inscription() {
               <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
                 <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Portail Actif
+                  {t('Portail Actif', 'Portal Open')}
                 </span>
-                <span>25 – 27 Mai 2027</span>
+                <span>{t('25 – 27 Mai 2027', '25 – 27 May 2027')}</span>
               </div>
               <div className="pt-3 border-t border-white/15 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-white/10 text-emerald-300 shrink-0 mt-0.5">
@@ -317,13 +367,13 @@ function Inscription() {
                 </div>
                 <div>
                   <span className="text-[11px] font-mono uppercase tracking-wider text-white/70 block">
-                    Lieu du congrès
+                    {t('Lieu du congrès', 'Congress venue')}
                   </span>
                   <div className="font-editorial-serif text-lg sm:text-xl font-bold text-white leading-snug mt-0.5">
-                    Palais des Congrès de Yaoundé
+                    {t('Palais des Congrès de Yaoundé', 'Yaoundé Conference Centre')}
                   </div>
                   <div className="text-xs text-white/75 mt-0.5">
-                    Yaoundé · Cameroun
+                    {t('Yaoundé · Cameroun', 'Yaoundé · Cameroon')}
                   </div>
                 </div>
               </div>
@@ -367,38 +417,41 @@ function Inscription() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-mono text-[#00765a] font-bold uppercase tracking-wider mb-1.5">
                 <Banknote className="w-4 h-4" />
-                <span>Barème Officiel</span>
+                <span>{t('Barème Officiel', 'Official Fees')}</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-serif-title font-bold text-[#1a1a1a]">
-                Grille Tarifaire d'Inscription
+                {t("Grille Tarifaire d'Inscription", 'Registration Fees')}
               </h2>
               <p className="text-sm sm:text-base text-[#555555] mt-2 max-w-2xl">
-                Sélectionnez votre catégorie professionnelle ci-dessous pour
-                pré-remplir automatiquement le formulaire d'accréditation.
+                {t(
+                  "Sélectionnez votre catégorie professionnelle ci-dessous pour pré-remplir automatiquement le formulaire d'accréditation.",
+                  'Select your professional category below to pre-fill the accreditation form automatically.'
+                )}
               </p>
             </div>
 
             <div className="text-xs font-mono uppercase tracking-wider text-[#555555] bg-white border border-[#dce0e8] px-4 py-2 rounded-full self-start md:self-auto">
-              Montants exprimés en Francs CFA (XAF)
+              {t('Montants exprimés en Francs CFA (XAF)', 'Amounts in CFA Francs (XAF)')}
             </div>
           </div>
 
           <div className="bg-white rounded-3xl border border-[#dce0e8] shadow-xs overflow-hidden">
             <div className="hidden md:grid md:grid-cols-12 gap-6 px-8 py-4 bg-[#f8f8fa] border-b border-[#dce0e8] text-[11px] font-mono uppercase tracking-wider text-[#555555] font-semibold">
-              <div className="col-span-7">Catégorie &amp; Profil concerné</div>
-              <div className="col-span-3 text-right">Droits d'inscription</div>
-              <div className="col-span-2 text-right">Sélection</div>
+              <div className="col-span-7">{t('Catégorie & Profil concerné', 'Category & Profile')}</div>
+              <div className="col-span-3 text-right">{t("Droits d'inscription", 'Registration fee')}</div>
+              <div className="col-span-2 text-right">{t('Sélection', 'Select')}</div>
             </div>
 
             <div className="divide-y divide-[#dce0e8]/80">
-              {CATEGORIES_TARIFS.map((cat) => {
+              {CATEGORIES_TARIFS.map((rawCat) => {
+                const cat = pick(rawCat);
                 const IconComponent = cat.icon;
-                const isSelected = selectedProfession === cat.titre;
+                const isSelected = selectedProfession === rawCat.titre;
 
                 return (
                   <div
                     key={cat.id}
-                    onClick={() => handleSelectTarif(cat.titre)}
+                    onClick={() => handleSelectTarif(rawCat.titre)}
                     className={`px-6 sm:px-8 py-6 transition-colors relative cursor-pointer ${
                       isSelected ? 'bg-red-50/40' : 'hover:bg-[#f8f8fa]/80'
                     }`}
@@ -456,7 +509,7 @@ function Inscription() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSelectTarif(cat.titre);
+                              handleSelectTarif(rawCat.titre);
                             }}
                             className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                               isSelected
@@ -467,11 +520,11 @@ function Inscription() {
                             {isSelected ? (
                               <>
                                 <Check className="w-3.5 h-3.5" />
-                                <span>Sélectionné</span>
+                                <span>{t('Sélectionné', 'Selected')}</span>
                               </>
                             ) : (
                               <>
-                                <span>Choisir</span>
+                                <span>{t('Choisir', 'Choose')}</span>
                                 <ArrowRight className="w-3.5 h-3.5" />
                               </>
                             )}
@@ -512,14 +565,16 @@ function Inscription() {
                 <UserCheck className="w-6 h-6" />
               </div>
               <span className="text-xs font-mono uppercase tracking-widest text-[#c11236] font-semibold">
-                Accréditation Nominative
+                {t('Accréditation Nominative', 'Personal Accreditation')}
               </span>
               <h2 className="text-3xl sm:text-4xl font-serif-title font-bold text-[#1a1a1a] mt-1">
-                Formulaire d'inscription individuelle
+                {t("Formulaire d'inscription individuelle", 'Individual registration form')}
               </h2>
               <p className="text-sm sm:text-base text-[#555555] mt-2">
-                Renseignez vos coordonnées et joignez votre justificatif
-                professionnel pour enregistrer votre badge officiel.
+                {t(
+                  'Renseignez vos coordonnées et joignez votre justificatif professionnel pour enregistrer votre badge officiel.',
+                  'Enter your details and attach your professional supporting document to register your official badge.'
+                )}
               </p>
             </div>
 
@@ -531,13 +586,13 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-lastname"
                   >
-                    Noms <span className="text-[#c11236]">*</span>
+                    {t('Noms', 'Last name(s)')} <span className="text-[#c11236]">*</span>
                   </label>
                   <input
                     id="reg-lastname"
                     type="text"
                     required
-                    placeholder="ex. Tchamba"
+                    placeholder={t('ex. Tchamba', 'e.g. Tchamba')}
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   />
                 </div>
@@ -548,13 +603,13 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-firstname"
                   >
-                    Prénoms <span className="text-[#c11236]">*</span>
+                    {t('Prénoms', 'First name(s)')} <span className="text-[#c11236]">*</span>
                   </label>
                   <input
                     id="reg-firstname"
                     type="text"
                     required
-                    placeholder="ex. Emilienne"
+                    placeholder={t('ex. Emilienne', 'e.g. Emilienne')}
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   />
                 </div>
@@ -565,13 +620,13 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-email"
                   >
-                    Adresse e-mail <span className="text-[#c11236]">*</span>
+                    {t('Adresse e-mail', 'Email address')} <span className="text-[#c11236]">*</span>
                   </label>
                   <input
                     id="reg-email"
                     type="email"
                     required
-                    placeholder="dr.nom@hopital.cm"
+                    placeholder={t('dr.nom@hopital.cm', 'dr.name@hospital.org')}
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   />
                 </div>
@@ -582,13 +637,13 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-phone"
                   >
-                    Numéro de téléphone <span className="text-[#c11236]">*</span>
+                    {t('Numéro de téléphone', 'Phone number')} <span className="text-[#c11236]">*</span>
                   </label>
                   <input
                     id="reg-phone"
                     type="tel"
                     required
-                    placeholder="ex. 694 12 64 61"
+                    placeholder={t('ex. 694 12 64 61', 'e.g. 694 12 64 61')}
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   />
                 </div>
@@ -599,7 +654,7 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-title"
                   >
-                    Titre honorifique <span className="text-[#c11236]">*</span>
+                    {t('Titre honorifique', 'Title')} <span className="text-[#c11236]">*</span>
                   </label>
                   <select
                     id="reg-title"
@@ -608,12 +663,12 @@ function Inscription() {
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   >
                     <option disabled value="">
-                      Sélectionnez un titre
+                      {t('Sélectionnez un titre', 'Select a title')}
                     </option>
-                    <option value="Pr. (Professeur)">Pr. (Professeur)</option>
-                    <option value="Dr. (Docteur)">Dr. (Docteur)</option>
-                    <option value="M. (Monsieur)">M. (Monsieur)</option>
-                    <option value="Mme (Madame)">Mme (Madame)</option>
+                    <option value="Pr. (Professeur)">{t('Pr. (Professeur)', 'Prof. (Professor)')}</option>
+                    <option value="Dr. (Docteur)">{t('Dr. (Docteur)', 'Dr. (Doctor)')}</option>
+                    <option value="M. (Monsieur)">{t('M. (Monsieur)', 'Mr')}</option>
+                    <option value="Mme (Madame)">{t('Mme (Madame)', 'Mrs / Ms')}</option>
                   </select>
                 </div>
 
@@ -623,7 +678,7 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-profession"
                   >
-                    Catégorie professionnelle{' '}
+                    {t('Catégorie professionnelle', 'Professional category')}{' '}
                     <span className="text-[#c11236]">*</span>
                   </label>
                   <select
@@ -634,11 +689,11 @@ function Inscription() {
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   >
                     <option disabled value="">
-                      Sélectionnez votre catégorie
+                      {t('Sélectionnez votre catégorie', 'Select your category')}
                     </option>
                     {CATEGORIES_TARIFS.map((cat) => (
                       <option key={cat.id} value={cat.titre}>
-                        {cat.titre} — {cat.prixAffiche} {cat.devise}
+                        {pick(cat).titre} — {cat.prixAffiche} {cat.devise}
                       </option>
                     ))}
                   </select>
@@ -650,7 +705,7 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-quality"
                   >
-                    Vous participez en qualité de{' '}
+                    {t('Vous participez en qualité de', 'You are attending as')}{' '}
                     <span className="text-[#c11236]">*</span>
                   </label>
                   <select
@@ -660,14 +715,14 @@ function Inscription() {
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   >
                     <option disabled value="">
-                      Choisir un statut
+                      {t('Choisir un statut', 'Choose a status')}
                     </option>
-                    <option value="Participant">Participant</option>
-                    <option value="Exposant médical">Exposant médical</option>
+                    <option value="Participant">{t('Participant', 'Participant')}</option>
+                    <option value="Exposant médical">{t('Exposant médical', 'Medical exhibitor')}</option>
                     <option value="Sponsor & Partenaire">
-                      Sponsor &amp; Partenaire
+                      {t('Sponsor & Partenaire', 'Sponsor & Partner')}
                     </option>
-                    <option value="Intervenant">Intervenant</option>
+                    <option value="Intervenant">{t('Intervenant', 'Speaker')}</option>
                   </select>
                 </div>
 
@@ -685,7 +740,7 @@ function Inscription() {
                     id="reg-institution"
                     type="text"
                     required
-                    placeholder="ex. CHUY, FMSB Yaoundé, Hôpital Laquintinie..."
+                    placeholder={t('ex. CHUY, FMSB Yaoundé, Hôpital Laquintinie...', 'e.g. CHUY, FMSB Yaoundé, Laquintinie Hospital...')}
                     className="w-full px-4 py-3 rounded-xl bg-[#f8f8fa] border border-[#dce0e8] text-[#1a1a1a] placeholder:text-[#555555]/50 text-sm focus:bg-white focus:outline-none focus:border-[#c11236] focus:ring-1 focus:ring-[#c11236] transition-colors"
                   />
                 </div>
@@ -698,22 +753,27 @@ function Inscription() {
                     className="block text-sm text-[#1a1a1a] font-semibold"
                     htmlFor="reg-proof"
                   >
-                    Justificatif de statut / profession (PDF ou Image){' '}
+                    {t('Justificatif de statut / profession (PDF ou Image)', 'Proof of status / profession (PDF or image)')}{' '}
                     <span className="text-[#c11236]">*</span>
                   </label>
                   <span className="text-[11px] font-mono text-[#555555]">
-                    PDF, JPG, PNG · Max 4 Mo
+                    {t('PDF, JPG, PNG · Max 15 Mo', 'PDF, JPG, PNG · Max 15 MB')}
                   </span>
                 </div>
 
-                {categorieActive && (
+                {categorieActiveAffichee && (
                   <p className="text-xs text-[#00765a] bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3.5 py-2">
-                    <strong>Document attendu :</strong>{' '}
-                    {categorieActive.justificatifAttendu}
+                    <strong>{t('Document attendu :', 'Expected document:')}</strong>{' '}
+                    {categorieActiveAffichee.justificatifAttendu}
                   </p>
                 )}
 
-                {!justificatif ? (
+                {compressionEnCours ? (
+                  <div className="flex items-center justify-center gap-2 p-6 rounded-2xl border-2 border-dashed border-[#00765a]/40 bg-emerald-50/40 text-sm font-semibold text-[#00765a]">
+                    <span className="w-4 h-4 rounded-full border-2 border-[#00765a] border-t-transparent animate-spin" />
+                    <span>{t('Optimisation de la photo en cours...', 'Optimising your photo...')}</span>
+                  </div>
+                ) : !justificatif ? (
                   <label
                     htmlFor="reg-proof"
                     className="flex flex-col items-center justify-center gap-2 p-6 rounded-2xl border-2 border-dashed border-[#dce0e8] hover:border-[#c11236] bg-[#f8f8fa] hover:bg-red-50/20 cursor-pointer transition-colors text-center"
@@ -722,12 +782,13 @@ function Inscription() {
                       <Upload className="w-5 h-5" />
                     </div>
                     <div className="text-sm font-semibold text-[#1a1a1a]">
-                      Cliquez pour téléverser votre pièce justificative
+                      {t('Cliquez pour téléverser votre pièce justificative', 'Click to upload your supporting document')}
                     </div>
                     <p className="text-xs text-[#555555] max-w-md">
-                      Carte professionnelle, carte d’étudiant, attestation de
-                      service ou d’association de patients (format PDF ou photo
-                      lisible).
+                      {t(
+                        'Carte professionnelle, carte d’étudiant, attestation de service ou d’association de patients (format PDF ou photo lisible).',
+                        'Professional card, student card, proof of employment or patient association certificate (PDF or legible photo).'
+                      )}
                     </p>
                     <input
                       id="reg-proof"
@@ -748,8 +809,9 @@ function Inscription() {
                           {justificatif.fileName}
                         </p>
                         <p className="text-xs text-[#00765a]">
-                          {(justificatif.fileSize / 1024).toFixed(0)} Ko · Prêt
-                          pour archivage
+                          {justificatif.originalSize
+                            ? `${formaterTaille(justificatif.originalSize)} → ${formaterTaille(justificatif.fileSize)} · ${t('Photo optimisée', 'Photo optimised')}`
+                            : `${formaterTaille(justificatif.fileSize)} · ${t('Prêt pour archivage', 'Ready to upload')}`}
                         </p>
                       </div>
                     </div>
@@ -758,7 +820,7 @@ function Inscription() {
                       type="button"
                       onClick={removeFile}
                       className="p-2 rounded-lg text-[#555555] hover:text-[#c11236] hover:bg-white transition-colors cursor-pointer"
-                      title="Retirer le fichier"
+                      title={t('Retirer le fichier', 'Remove file')}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -777,24 +839,32 @@ function Inscription() {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-[#c11236] shrink-0 mt-0.5" />
                   <div className="text-xs sm:text-sm text-[#1a1a1a] leading-relaxed">
-                    <strong className="text-[#8b0a1d] block mb-1">
-                      Clause de contrôle des justificatifs et de
-                      non-remboursement :
-                    </strong>
-                    Le tarif appliqué dépend strictement de votre catégorie
-                    professionnelle réelle. Tout dossier comportant une{' '}
-                    <strong>fausse déclaration de statut</strong> ou un{' '}
-                    <strong>justificatif non conforme</strong> entraînera{' '}
-                    <strong>
-                      l’annulation immédiate de votre accréditation
-                    </strong>{' '}
-                    lors du contrôle à l’entrée du Palais des Congrès.{' '}
-                    <strong>
-                      Aucun remboursement des sommes déjà versées ne sera
-                      effectué
-                    </strong>
-                    , et l’accès aux salles sera subordonné au paiement intégral
-                    de la différence au tarif plein.
+                    {t(
+                      <>
+                        <strong className="text-[#8b0a1d] block mb-1">
+                          Clause de contrôle des justificatifs et de non-remboursement :
+                        </strong>
+                        Le tarif appliqué dépend strictement de votre catégorie professionnelle réelle. Tout
+                        dossier comportant une <strong>fausse déclaration de statut</strong> ou un{' '}
+                        <strong>justificatif non conforme</strong> entraînera{' '}
+                        <strong>l’annulation immédiate de votre accréditation</strong> lors du contrôle à
+                        l’entrée du Palais des Congrès.{' '}
+                        <strong>Aucun remboursement des sommes déjà versées ne sera effectué</strong>, et
+                        l’accès aux salles sera subordonné au paiement intégral de la différence au tarif plein.
+                      </>,
+                      <>
+                        <strong className="text-[#8b0a1d] block mb-1">
+                          Document verification and no-refund clause:
+                        </strong>
+                        The fee charged depends strictly on your actual professional category. Any application
+                        containing a <strong>false declaration of status</strong> or a{' '}
+                        <strong>non-compliant supporting document</strong> will result in the{' '}
+                        <strong>immediate cancellation of your accreditation</strong> at the Conference Centre
+                        entrance check.{' '}
+                        <strong>No refund will be made of any amounts already paid</strong>, and access to the
+                        session rooms will be subject to payment in full of the difference at the full rate.
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -805,10 +875,11 @@ function Inscription() {
                     className="mt-0.5 h-4 w-4 rounded border-[#dce0e8] accent-[#8b0a1d] cursor-pointer"
                   />
                   <span className="text-xs font-medium text-[#1a1a1a] leading-relaxed">
-                    Je certifie sur l’honneur l’exactitude de ma catégorie
-                    professionnelle ainsi que l’authenticité du justificatif
-                    joint, et j’accepte la clause de non-remboursement en cas de
-                    fausse déclaration. <span className="text-[#c11236]">*</span>
+                    {t(
+                      'Je certifie sur l’honneur l’exactitude de ma catégorie professionnelle ainsi que l’authenticité du justificatif joint, et j’accepte la clause de non-remboursement en cas de fausse déclaration.',
+                      'I solemnly certify that my professional category is accurate and that the attached document is authentic, and I accept the no-refund clause in the event of a false declaration.'
+                    )}{' '}
+                    <span className="text-[#c11236]">*</span>
                   </span>
                 </label>
               </div>
@@ -818,14 +889,14 @@ function Inscription() {
                 <div className="rounded-2xl bg-[#f8f8fa] border border-[#dce0e8] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
                     <span className="text-[11px] font-mono uppercase tracking-wider text-[#555555] font-semibold block">
-                      Tarif applicable à votre catégorie
+                      {t('Tarif applicable à votre catégorie', 'Fee for your category')}
                     </span>
                     <span className="text-sm font-semibold text-[#1a1a1a]">
-                      {selectedProfession}
+                      {categorieActiveAffichee?.titre}
                     </span>
                   </div>
                   <div className="font-mono text-2xl font-bold text-[#c11236] tabular-nums">
-                    {montantActuel.toLocaleString('fr-FR')} FCFA
+                    {montantActuel.toLocaleString(lang === 'en' ? 'en-GB' : 'fr-FR')} FCFA
                   </div>
                 </div>
               )}
@@ -836,15 +907,17 @@ function Inscription() {
                   type="submit"
                   className="w-full sm:w-auto sm:min-w-[360px] px-8 py-4 rounded-full bg-[#c11236] hover:bg-[#8b0a1d] text-white text-base font-semibold flex items-center justify-center gap-2.5 transition-colors shadow-sm group cursor-pointer"
                 >
-                  <span>S'inscrire et procéder au paiement</span>
+                  <span>{t("S'inscrire et procéder au paiement", 'Register and proceed to payment')}</span>
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </button>
 
                 <div className="flex items-center gap-1.5 text-[#00765a] text-xs font-medium">
                   <Lock className="w-3.5 h-3.5 shrink-0" />
                   <span>
-                    Paiement 100 % sécurisé. Aucune donnée bancaire n'est
-                    stockée sur ce site.
+                    {t(
+                      "Paiement 100 % sécurisé. Aucune donnée bancaire n'est stockée sur ce site.",
+                      '100% secure payment. No banking data is stored on this site.'
+                    )}
                   </span>
                 </div>
               </div>

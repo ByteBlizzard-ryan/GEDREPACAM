@@ -20,7 +20,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173'],
+    // Le site en local + l'adresse du site en ligne (FRONTEND_URL dans .env,
+    // ex. https://votre-site.vercel.app). Plusieurs adresses : séparez-les par des virgules.
+    'allowed_origins' => array_values(array_filter(array_unique(array_merge(
+        ['http://localhost:5173'],
+        array_map('trim', explode(',', (string) env('FRONTEND_URL', '')))
+    )))),
 
     'allowed_origins_patterns' => [],
 

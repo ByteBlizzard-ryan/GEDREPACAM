@@ -3,9 +3,11 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { XCircle } from 'lucide-react';
 import BadgeConference from './BadgeConference';
 import { genererSignatureBadge } from './utils/badgeUtils';
+import { useLang } from './context/LanguageContext';
 
 function MonBadge() {
   const [searchParams] = useSearchParams();
+  const { t } = useLang();
 
   const transId = searchParams.get('id') || '';
   const titre = searchParams.get('titre') || '';
@@ -30,14 +32,17 @@ function MonBadge() {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden text-center">
           <div className="bg-[#c11236] text-white p-6">
             <XCircle size={48} className="mx-auto mb-2" />
-            <h1 className="text-xl font-extrabold">Lien de badge invalide</h1>
+            <h1 className="text-xl font-extrabold">{t('Lien de badge invalide', 'Invalid badge link')}</h1>
           </div>
           <div className="p-6 space-y-4">
             <p className="text-sm text-gray-600">
-              Ce lien est incomplet ou a été modifié. Utilisez le bouton présent dans votre e-mail de confirmation.
+              {t(
+                'Ce lien est incomplet ou a été modifié. Utilisez le bouton présent dans votre e-mail de confirmation.',
+                'This link is incomplete or has been altered. Please use the button in your confirmation email.'
+              )}
             </p>
             <Link to="/" className="inline-block text-sm font-bold text-[#c11236] underline">
-              Retour à l'accueil
+              {t("Retour à l'accueil", 'Back to home')}
             </Link>
           </div>
         </div>

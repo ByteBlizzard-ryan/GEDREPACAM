@@ -18,6 +18,13 @@ return [
     'default' => env('CACHE_STORE', 'database'),
 
     /*
+    | Stockage utilisé pour limiter le nombre d'appels (middleware « throttle »).
+    | En fichiers : la limite fonctionne même si la base de données est arrêtée.
+    */
+
+    'limiter' => env('CACHE_LIMITER_STORE', 'file'),
+
+    /*
     |--------------------------------------------------------------------------
     | Cache Stores
     |--------------------------------------------------------------------------

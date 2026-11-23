@@ -28,6 +28,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Paiements Mobile Money (inscriptions au congrès)
+    'fapshi' => [
+        'base_url' => env('FAPSHI_API_URL'),
+        'api_user' => env('FAPSHI_API_USER'),
+        'api_key' => env('FAPSHI_API_KEY'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

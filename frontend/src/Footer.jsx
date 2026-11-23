@@ -5,6 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, Headset, Globe, Clock } from 'lucide-react';
+import { useLang } from './context/LanguageContext';
 
 const BORDEAUX = '#8b0a1d';
 const RED = '#c11236';
@@ -20,11 +21,12 @@ const focusRing =
   'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c11236]';
 
 const PATRONAGES = [
-  'Ministère de la Santé Publique du Cameroun (MINSANTE)',
-  "GEDREPACAM (Groupe d'Étude)"
+  { fr: 'Ministère de la Santé Publique du Cameroun (MINSANTE)', en: 'Ministry of Public Health of Cameroon (MINSANTE)' },
+  { fr: "GEDREPACAM (Groupe d'Étude)", en: 'GEDREPACAM (Study Group)' }
 ];
 
 function Footer() {
+  const { t } = useLang();
   const colTitle = 'mb-3 text-[16px] font-bold text-[#1a1a1a]';
 
   return (
@@ -49,14 +51,14 @@ function Footer() {
               GEDREPACAM 2027
             </h2>
             <p className="mt-1 text-[13px] font-semibold" style={{ color: GREEN }}>
-              5ème Congrès International de la Drépanocytose
+              {t('5ème Congrès International de la Drépanocytose', '5th International Sickle Cell Disease Congress')}
             </p>
             <div className="mt-3 border-l-2 border-[#c11236]/40 pl-3">
               <p className="font-semibold text-[#1a1a1a]">
-                Palais des Congrès de Yaoundé
+                {t('Palais des Congrès de Yaoundé', 'Yaoundé Conference Centre')}
               </p>
               <p className="mt-0.5 text-[#555555]">
-                Mont Fébé, Yaoundé, République du Cameroun
+                {t('République du Cameroun', 'Republic of Cameroon')}
               </p>
             </div>
           </div>
@@ -64,16 +66,16 @@ function Footer() {
           {/* Patronages */}
           <div>
             <h3 className={colTitle} style={SERIF}>
-              Hauts patronages et égides
+              {t('Hauts patronages et égides', 'Patronage and auspices')}
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0 leading-snug">
               {PATRONAGES.map((p) => (
-                <li key={p} className="flex items-start gap-2">
+                <li key={p.fr} className="flex items-start gap-2">
                   <span
                     aria-hidden="true"
                     className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00765a]"
                   />
-                  <span>{p}</span>
+                  <span>{t(p.fr, p.en)}</span>
                 </li>
               ))}
             </ul>
@@ -82,7 +84,7 @@ function Footer() {
           {/* Contacts */}
           <div>
             <h3 className={colTitle} style={SERIF}>
-              Secrétariat et contacts
+              {t('Secrétariat et contacts', 'Secretariat and contacts')}
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               <li className="flex items-center gap-2.5">
@@ -109,7 +111,7 @@ function Footer() {
                   aria-hidden="true"
                 />
                 <span>
-                  Permanence :{' '}
+                  {t('Permanence :', 'Hotline:')}{' '}
                   <a
                     href="tel:+237694126461"
                     className={`rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
@@ -127,7 +129,7 @@ function Footer() {
                   aria-hidden="true"
                 />
                 <span>
-                  Support :{' '}
+                  {t('Support :', 'Support:')}{' '}
                   <a
                     href="tel:+237677489614"
                     className={`rounded font-medium text-[#1a1a1a] transition-colors hover:text-[#c11236] ${focusRing}`}
@@ -160,7 +162,7 @@ function Footer() {
                   className="shrink-0 text-[#8a8a94]"
                   aria-hidden="true"
                 />
-                <span>Lun - Ven, 08h00 - 18h00 (GMT+1)</span>
+                <span>{t('Lun - Ven, 08h00 - 18h00 (GMT+1)', 'Mon - Fri, 8:00 am - 6:00 pm (GMT+1)')}</span>
               </li>
             </ul>
           </div>
@@ -169,20 +171,20 @@ function Footer() {
         {/* Mentions légales */}
         <div className="flex flex-col items-center justify-between gap-2 border-t border-[#dce0e8] py-4 text-[12.5px] text-[#555555] md:flex-row">
           <span className="text-center md:text-left">
-            © 2027 5ème Congrès International de la Drépanocytose. Tous droits réservés.
+            {t('© 2027 5ème Congrès International de la Drépanocytose. Tous droits réservés.', '© 2027 5th International Sickle Cell Disease Congress. All rights reserved.')}
           </span>
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 font-semibold text-[#1a1a1a]">
             <Link
               to="/mentions-legales"
               className={`rounded transition-colors hover:text-[#c11236] ${focusRing}`}
             >
-              Mentions légales
+              {t('Mentions légales', 'Legal notice')}
             </Link>
             <Link
               to="/ethique-recherche"
               className={`rounded transition-colors hover:text-[#c11236] ${focusRing}`}
             >
-              Éthique et recherche
+              {t('Éthique et recherche', 'Ethics and research')}
             </Link>
             <Link
               to="/contact"

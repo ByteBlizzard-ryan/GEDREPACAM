@@ -3,9 +3,11 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import { Download, CheckCircle2, MapPin } from 'lucide-react';
 import { construireUrlVerification } from './utils/badgeUtils';
+import { useLang } from './context/LanguageContext';
 
 function BadgeConference({ donnees, transId }) {
   const badgeRef = useRef(null);
+  const { t } = useLang();
   const verificationUrl = construireUrlVerification({ transId, donnees });
 
   const handleDownload = async () => {
@@ -18,7 +20,7 @@ function BadgeConference({ donnees, transId }) {
       link.click();
     } catch (err) {
       console.error("Erreur génération PNG :", err);
-      alert("Impossible de télécharger l'image. Effectuez une capture d'écran de votre badge.");
+      alert(t("Impossible de télécharger l'image. Effectuez une capture d'écran de votre badge.", 'Unable to download the image. Please take a screenshot of your badge.'));
     }
   };
 
@@ -26,7 +28,7 @@ function BadgeConference({ donnees, transId }) {
     <div className="flex flex-col items-center space-y-6">
       <div className="flex items-center justify-center gap-2 text-[#00765a] font-bold text-center text-sm">
         <CheckCircle2 size={22} className="shrink-0" />
-        <span>Inscription confirmée ! Voici votre badge officiel d'accès.</span>
+        <span>{t("Inscription confirmée ! Voici votre badge officiel d'accès.", 'Registration confirmed! Here is your official access badge.')}</span>
       </div>
 
       <div
@@ -35,14 +37,14 @@ function BadgeConference({ donnees, transId }) {
       >
         <div className="bg-[#c11236] text-white p-5 text-center">
           <p className="text-[10px] uppercase tracking-widest font-bold opacity-90">
-            5ème Congrès International de la Drépanocytose
+            {t('5ème Congrès International de la Drépanocytose', '5th International Sickle Cell Disease Congress')}
           </p>
           <h3 className="text-xl font-extrabold tracking-tight mt-1">
             GEDREPACAM
           </h3>
           <div className="flex items-center justify-center gap-1 text-[11px] mt-2 opacity-95">
             <MapPin size={12} />
-            <span>Palais des Congrès, Yaoundé</span>
+            <span>{t('Palais des Congrès, Yaoundé', 'Conference Centre, Yaoundé')}</span>
           </div>
         </div>
 
@@ -61,7 +63,7 @@ function BadgeConference({ donnees, transId }) {
           <div className="text-sm text-gray-600 space-y-0.5">
             <p className="font-semibold text-gray-800">{donnees.profession}</p>
             <p className="text-xs text-gray-500">{donnees.institution}</p>
-            <p className="text-xs font-mono text-gray-500 pt-1">Tél : {donnees.telephone}</p>
+            <p className="text-xs font-mono text-gray-500 pt-1">{t('Tél :', 'Tel:')} {donnees.telephone}</p>
           </div>
 
           <div className="pt-3 flex flex-col items-center">
@@ -74,13 +76,13 @@ function BadgeConference({ donnees, transId }) {
               />
             </div>
             <span className="text-[11px] font-mono text-gray-400 mt-2">
-              RÉF : {transId}
+              {t('RÉF :', 'REF:')} {transId}
             </span>
           </div>
         </div>
 
         <div className="bg-[#00765a] text-white text-center py-2.5 px-4 text-[11px] font-semibold tracking-wide">
-          PRÉSENTEZ CE BADGE À L'ACCUEIL CHAQUE JOUR
+          {t("PRÉSENTEZ CE BADGE À L'ACCUEIL CHAQUE JOUR", 'SHOW THIS BADGE AT THE FRONT DESK EVERY DAY')}
         </div>
       </div>
 
@@ -90,7 +92,7 @@ function BadgeConference({ donnees, transId }) {
         className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#00765a] hover:bg-[#005c46] text-white font-bold shadow-md transition-colors cursor-pointer"
       >
         <Download size={18} />
-        <span>Télécharger mon badge (PNG)</span>
+        <span>{t('Télécharger mon badge (PNG)', 'Download my badge (PNG)')}</span>
       </button>
     </div>
   );

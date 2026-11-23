@@ -11,7 +11,9 @@ import {
 
 // Import des images locales depuis ./assets/
 import heroBg from './assets/ImageFondConférence.jpeg';
+import heroBgEn from './assets/GEDREPACAM_Congress_EN.jpg'; // affiche en anglais
 import logoEbPartner from './assets/eb-partner.jpeg';
+import { useLang } from './context/LanguageContext';
 // import logoPad from './assets/pad.png';
 // import logoSabc from './assets/sabc.png';
 // import logoCnps from './assets/cnps.png';
@@ -22,35 +24,40 @@ const PILIERS_STRATEGIQUES = [
     axe: 'Axe I',
     titre: 'Dépistage néonatal systématique',
     description:
-      "Généralisation précoce à l'échelle territoriale pour identifier la drépanocytose dès les premiers jours de vie, amorcer un suivi médical rapproché et prévenir radicalement les complications néonatales critiques."
+      "Généralisation précoce à l'échelle territoriale pour identifier la drépanocytose dès les premiers jours de vie, amorcer un suivi médical rapproché et prévenir radicalement les complications néonatales critiques.",
+    en: { axe: 'Area I', titre: 'Systematic newborn screening', description: 'Early nationwide roll-out to identify sickle cell disease in the first days of life, start close medical follow-up and prevent critical neonatal complications.' },
   },
   {
     num: '02',
     axe: 'Axe II',
     titre: 'Prise en charge & Protocoles équitables',
     description:
-      "Standardisation des conduites d'urgence, protocoles intégrés contre les crises vaso-occlusives et accès démocratisé à l'hydroxyurée, aux analgésiques majeurs et aux antibiotiques prophylactiques."
+      "Standardisation des conduites d'urgence, protocoles intégrés contre les crises vaso-occlusives et accès démocratisé à l'hydroxyurée, aux analgésiques majeurs et aux antibiotiques prophylactiques.",
+    en: { axe: 'Area II', titre: 'Equitable care & protocols', description: 'Standardised emergency management, integrated protocols for vaso-occlusive crises and widened access to hydroxyurea, strong analgesics and prophylactic antibiotics.' },
   },
   {
     num: '03',
     axe: 'Axe III',
     titre: 'Formation médicale continue',
     description:
-      'Renforcement continu des compétences des pédiatres, médecins généralistes, sages-femmes et soignants communautaires à travers des cursus certifiants et des compagnonnages cliniques.'
+      'Renforcement continu des compétences des pédiatres, médecins généralistes, sages-femmes et soignants communautaires à travers des cursus certifiants et des compagnonnages cliniques.',
+    en: { axe: 'Area III', titre: 'Continuing medical education', description: 'Ongoing skills development for paediatricians, general practitioners, midwives and community health workers through certified courses and clinical mentoring.' },
   },
   {
     num: '04',
     axe: 'Axe IV',
     titre: 'Sensibilisation & Inclusion communautaire',
     description:
-      'Éducation active des familles, déstigmatisation au sein des écoles et des villages, conseil génétique prémarital et accompagnement psychosocial bienveillant face à la douleur chronique.'
+      'Éducation active des familles, déstigmatisation au sein des écoles et des villages, conseil génétique prémarital et accompagnement psychosocial bienveillant face à la douleur chronique.',
+    en: { axe: 'Area IV', titre: 'Awareness & community inclusion', description: 'Active family education, reducing stigma in schools and villages, premarital genetic counselling and caring psychosocial support for chronic pain.' },
   },
   {
     num: '05',
     axe: 'Axe V',
     titre: 'Plaidoyer institutionnel & Pérennité',
     description:
-      'Mobilisation des gouvernements, bailleurs internationaux et partenaires techniques pour l’inscription prioritaire de la lutte contre la drépanocytose dans les budgets nationaux de santé.'
+      'Mobilisation des gouvernements, bailleurs internationaux et partenaires techniques pour l’inscription prioritaire de la lutte contre la drépanocytose dans les budgets nationaux de santé.',
+    en: { axe: 'Area V', titre: 'Institutional advocacy & sustainability', description: 'Mobilising governments, international donors and technical partners to make sickle cell disease a priority in national health budgets.' },
   }
 ];
 
@@ -61,7 +68,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Politiques de santé, gouvernance et stratégies nationales',
     domaine: 'Santé publique & Régulation',
     description:
-      'Intégration pérenne de la drépanocytose dans les plans stratégiques de santé, mutualisation des financements publics et harmonisation des directives ministérielles régionales.'
+      'Intégration pérenne de la drépanocytose dans les plans stratégiques de santé, mutualisation des financements publics et harmonisation des directives ministérielles régionales.',
+    en: { axe: 'Area I', titre: 'Health policy, governance and national strategies', domaine: 'Public health & Regulation', description: 'Lasting integration of sickle cell disease into strategic health plans, pooling of public funding and harmonisation of regional ministerial guidelines.' },
   },
   {
     num: '02',
@@ -69,7 +77,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Dépistage néonatal, innovations et assurance qualité',
     domaine: 'Biologie & Diagnostic rapide',
     description:
-      'Déploiement opérationnel des tests rapides (TDR) en maternité, protocoles de validation rigoureux en laboratoire de référence et structuration du registre de suivi néonatal.'
+      'Déploiement opérationnel des tests rapides (TDR) en maternité, protocoles de validation rigoureux en laboratoire de référence et structuration du registre de suivi néonatal.',
+    en: { axe: 'Area II', titre: 'Newborn screening, innovation and quality assurance', domaine: 'Biology & Rapid diagnostics', description: 'Roll-out of rapid diagnostic tests (RDTs) in maternity units, rigorous validation protocols in reference laboratories and a structured newborn follow-up registry.' },
   },
   {
     num: '03',
@@ -77,7 +86,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Prise en charge intégrée, accès aux soins et équité',
     domaine: 'Clinique & Urgences',
     description:
-      "Standardisation des conduites à tenir d'urgence, gestion aiguë des crises vaso-occlusives, prophylaxie infectieuse pédiatrique et réduction active des disparités d'accès territorial."
+      "Standardisation des conduites à tenir d'urgence, gestion aiguë des crises vaso-occlusives, prophylaxie infectieuse pédiatrique et réduction active des disparités d'accès territorial.",
+    en: { axe: 'Area III', titre: 'Integrated care, access and equity', domaine: 'Clinical care & Emergencies', description: 'Standardised emergency management, acute care of vaso-occlusive crises, paediatric infection prophylaxis and active reduction of geographic disparities in access.' },
   },
   {
     num: '04',
@@ -85,7 +95,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Innovations thérapeutiques et avancées biotechnologiques',
     domaine: 'Thérapies de pointe',
     description:
-      "Thérapies géniques, nouveaux modulateurs de l'affinité pour l'oxygène, accessibilité universelle à l'hydroxyurée et développement des filières de greffe allogénique en Afrique."
+      "Thérapies géniques, nouveaux modulateurs de l'affinité pour l'oxygène, accessibilité universelle à l'hydroxyurée et développement des filières de greffe allogénique en Afrique.",
+    en: { axe: 'Area IV', titre: 'Therapeutic innovation and biotechnology advances', domaine: 'Cutting-edge therapies', description: 'Gene therapies, new oxygen-affinity modulators, universal access to hydroxyurea and development of allogeneic transplant programmes in Africa.' },
   },
   {
     num: '05',
@@ -93,7 +104,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Dimensions psychosociales, communauté et prévention',
     domaine: 'Sciences humaines & Familles',
     description:
-      'Rôle cardinal des associations de familles, accompagnement psychologique de la douleur chronique, aménagement scolaire, insertion professionnelle et lutte contre l’isolement social.'
+      'Rôle cardinal des associations de familles, accompagnement psychologique de la douleur chronique, aménagement scolaire, insertion professionnelle et lutte contre l’isolement social.',
+    en: { axe: 'Area V', titre: 'Psychosocial dimensions, community and prevention', domaine: 'Humanities & Families', description: 'The key role of family associations, psychological support for chronic pain, school accommodations, employment and fighting social isolation.' },
   },
   {
     num: '06',
@@ -101,7 +113,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Recherche clinique, données probantes et innovation',
     domaine: 'Recherche translationnelle',
     description:
-      'Cohortes multicentriques africaines, biomarqueurs de vasculopathie, essais cliniques contextualisés et constitution de bases de données génomiques ouvertes et sécurisées.'
+      'Cohortes multicentriques africaines, biomarqueurs de vasculopathie, essais cliniques contextualisés et constitution de bases de données génomiques ouvertes et sécurisées.',
+    en: { axe: 'Area VI', titre: 'Clinical research, evidence and innovation', domaine: 'Translational research', description: 'Multicentre African cohorts, vasculopathy biomarkers, context-appropriate clinical trials and open, secure genomic databases.' },
   },
   {
     num: '07',
@@ -109,7 +122,8 @@ const THEMES_SCIENTIFIQUES = [
     titre: 'Coopération internationale, plaidoyer et perspectives',
     domaine: 'Alliances continentales',
     description:
-      'Partenariats scientifiques Sud-Sud et Nord-Sud, mutualisation des expertises régionales et mobilisation stratégique des bailleurs pour pérenniser le plan de lutte panafricain.'
+      'Partenariats scientifiques Sud-Sud et Nord-Sud, mutualisation des expertises régionales et mobilisation stratégique des bailleurs pour pérenniser le plan de lutte panafricain.',
+    en: { axe: 'Area VII', titre: 'International cooperation, advocacy and outlook', domaine: 'Continental alliances', description: 'South-South and North-South scientific partnerships, pooling of regional expertise and strategic donor mobilisation to sustain the pan-African plan.' },
   }
 ];
 
@@ -121,6 +135,7 @@ const PARTENAIRES = [
     sigle: 'EB-PARTNER',
     nom: 'EB-Partner',
     sousTitre: 'Partenaire Officiel · Congrès 2027',
+    en: { sousTitre: 'Official Partner · Congress 2027' },
     logo: logoEbPartner
   }
 ];
@@ -131,6 +146,7 @@ const NIVEAUX_PARTENAIRES = [
     key: 'or',
     titre: 'Partenaires Or',
     badgeLabel: 'Catégorie Or',
+    en: { titre: 'Gold Partners', badgeLabel: 'Gold Tier' },
     headerLine: 'from-amber-400 via-yellow-500 to-amber-600',
     pillStyle:
       'bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-xs',
@@ -146,6 +162,7 @@ const NIVEAUX_PARTENAIRES = [
     key: 'argent',
     titre: 'Partenaires Argent',
     badgeLabel: 'Catégorie Argent',
+    en: { titre: 'Silver Partners', badgeLabel: 'Silver Tier' },
     headerLine: 'from-slate-300 via-slate-400 to-slate-500',
     pillStyle:
       'bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-xs',
@@ -161,6 +178,7 @@ const NIVEAUX_PARTENAIRES = [
     key: 'bronze',
     titre: 'Partenaires Bronze',
     badgeLabel: 'Catégorie Bronze',
+    en: { titre: 'Bronze Partners', badgeLabel: 'Bronze Tier' },
     headerLine: 'from-amber-700 via-orange-700 to-amber-800',
     pillStyle:
       'bg-gradient-to-r from-amber-700 to-orange-800 text-white shadow-xs',
@@ -174,8 +192,11 @@ const NIVEAUX_PARTENAIRES = [
   }
 ];
 
-function PartnerTierCard({ partner, tier }) {
+function PartnerTierCard({ partner: rawPartner, tier: rawTier }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const { pick } = useLang();
+  const partner = pick(rawPartner);
+  const tier = pick(rawTier);
 
   return (
     <article
@@ -223,6 +244,7 @@ function PartnerTierCard({ partner, tier }) {
 }
 
 function Home() {
+  const { t, pick, lang } = useLang();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -268,8 +290,11 @@ function Home() {
         {/* Affiche affichée à 100 % de sa largeur sans rognage ni fond rouge */}
         <div className="w-full bg-white">
           <img
-            src={heroBg}
-            alt="5e Congrès International de la Drépanocytose — 25 au 27 mai 2027, Palais des Congrès de Yaoundé"
+            src={lang === 'en' ? heroBgEn : heroBg}
+            alt={t(
+              '5e Congrès International de la Drépanocytose — 25 au 27 mai 2027, Palais des Congrès de Yaoundé',
+              '5th International Sickle Cell Disease Congress — 25 to 27 May 2027, Yaoundé Conference Centre'
+            )}
             className="w-full h-auto block"
           />
         </div>
@@ -285,10 +310,10 @@ function Home() {
                 </span>
                 <div>
                   <p className="text-[11px] uppercase tracking-[0.2em] text-[#00765a] font-bold">
-                    Compte à rebours
+                    {t('Compte à rebours', 'Countdown')}
                   </p>
                   <p className="text-xs sm:text-sm text-[#555555] font-medium">
-                    Ouverture officielle dans
+                    {t('Ouverture officielle dans', 'Official opening in')}
                   </p>
                 </div>
               </div>
@@ -300,7 +325,7 @@ function Home() {
                       {String(timeLeft.days).padStart(2, '0')}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
-                      Jours
+                      {t('Jours', 'Days')}
                     </span>
                   </div>
 
@@ -309,7 +334,7 @@ function Home() {
                       {String(timeLeft.hours).padStart(2, '0')}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
-                      Heures
+                      {t('Heures', 'Hours')}
                     </span>
                   </div>
 
@@ -327,14 +352,16 @@ function Home() {
                       {String(timeLeft.secs).padStart(2, '0')}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider text-[#555555] mt-1 block font-medium">
-                      Secondes
+                      {t('Secondes', 'Seconds')}
                     </span>
                   </div>
                 </div>
               ) : (
                 <div className="py-2.5 px-5 rounded-xl bg-[#00765a]/10 border border-[#00765a]/25 text-[#00765a] font-editorial-serif font-semibold text-base sm:text-lg">
-                  Le 5<sup>e</sup> Congrès International de la Drépanocytose a
-                  débuté.
+                  {t(
+                    <>Le 5<sup>e</sup> Congrès International de la Drépanocytose a débuté.</>,
+                    <>The 5<sup>th</sup> International Sickle Cell Disease Congress has begun.</>
+                  )}
                 </div>
               )}
             </div>
@@ -345,7 +372,7 @@ function Home() {
                 to="/inscription"
                 className="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#8b0a1d] to-[#c11236] hover:from-[#7a0818] hover:to-[#a80e2e] text-white font-semibold text-sm transition-all duration-200 shadow-xs hover:scale-[1.02]"
               >
-                <span>S'inscrire au congrès</span>
+                <span>{t("S'inscrire au congrès", 'Register for the congress')}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
@@ -353,7 +380,7 @@ function Home() {
                 to="/programme"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-[#fcfaf9] hover:bg-[#c11236]/[0.05] text-[#1a1a1a] hover:text-[#8b0a1d] font-semibold text-sm border border-[#eedcdc] hover:border-[#c11236]/40 transition-all duration-200"
               >
-                Découvrir le programme
+                {t('Découvrir le programme', 'Explore the programme')}
               </Link>
             </div>
           </div>
@@ -468,22 +495,23 @@ function Home() {
             <div className="flex items-center gap-3 mb-4">
               <span className="h-px w-6 bg-[#c11236]" />
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#c11236]">
-                Axes Stratégiques · Horizon 2027–2032
+                {t('Axes Stratégiques · Horizon 2027–2032', 'Strategic Areas · 2027–2032 Horizon')}
               </p>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif-title font-bold text-[#1a1a1a] tracking-tight leading-[1.15] mb-4">
-              Les axes fondamentaux de notre action
+              {t('Les axes fondamentaux de notre action', 'The core areas of our action')}
             </h2>
             <p className="text-[#555555] text-base sm:text-lg leading-relaxed font-light">
-              Un continuum clinique et institutionnel intégré : de
-              l'identification néonatale précoce à la pérennité budgétaire
-              d'État, articulé autour de 5 domaines d'intervention prioritaires.
+              {t(
+                "Un continuum clinique et institutionnel intégré : de l'identification néonatale précoce à la pérennité budgétaire d'État, articulé autour de 5 domaines d'intervention prioritaires.",
+                'An integrated clinical and institutional continuum, from early newborn identification to sustainable state funding, built around 5 priority areas of intervention.'
+              )}
             </p>
           </div>
 
           {/* Matrice 5 Colonnes */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-stretch">
-            {PILIERS_STRATEGIQUES.map((pilier) => (
+            {PILIERS_STRATEGIQUES.map(pick).map((pilier) => (
               <article
                 key={pilier.num}
                 className="bg-white rounded-2xl border border-[#eedcdc]/80 p-8 flex flex-col justify-start hover:border-[#c11236]/40 hover:shadow-md transition-all duration-300"
@@ -616,50 +644,58 @@ function Home() {
               <div className="inline-flex items-center justify-center gap-2 mb-3">
                 <span className="h-px w-8 bg-[#c11236]" />
                 <span className="text-xs uppercase tracking-widest text-[#c11236] font-bold">
-                  Message du Président
+                  {t('Message du Président', "President's Message")}
                 </span>
                 <span className="h-px w-8 bg-[#c11236]" />
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif-title font-bold text-[#1a1a1a] leading-snug">
-                Construire ensemble des recommandations concrètes et adaptées à
-                nos réalités
+                {t(
+                  'Construire ensemble des recommandations concrètes et adaptées à nos réalités',
+                  'Building together practical recommendations suited to our realities'
+                )}
               </h2>
               <div className="w-16 h-1 bg-[#c11236] mx-auto mt-4 rounded-full" />
             </div>
 
             <div className="space-y-6 text-[#555555] text-base sm:text-lg leading-relaxed">
               <p className="first-letter-drop font-editorial-serif italic text-[#1a1a1a]">
-                Chers collègues, chers partenaires, chers amis de la lutte
-                contre la drépanocytose,
+                {t(
+                  'Chers collègues, chers partenaires, chers amis de la lutte contre la drépanocytose,',
+                  'Dear colleagues, dear partners, dear friends in the fight against sickle cell disease,'
+                )}
               </p>
               <p>
-                C'est avec un immense plaisir que le GEDREPACAM vous accueille à
-                Yaoundé, du 25 au 27 mai 2027, pour la 5<sup>e</sup> édition du
-                Congrès International de la Drépanocytose, placée sous le Haut
-                Parrainage du Ministre de la Santé Publique.
+                {t(
+                  <>
+                    C'est avec un immense plaisir que le GEDREPACAM vous accueille à Yaoundé, du 25 au 27 mai
+                    2027, pour la 5<sup>e</sup> édition du Congrès International de la Drépanocytose, placée
+                    sous le Haut Parrainage du Ministre de la Santé Publique.
+                  </>,
+                  <>
+                    It is with great pleasure that GEDREPACAM welcomes you to Yaoundé, from 25 to 27 May 2027,
+                    for the 5<sup>th</sup> International Sickle Cell Disease Congress, held under the High
+                    Patronage of the Minister of Public Health.
+                  </>
+                )}
               </p>
               <p>
-                Cette année, nous placerons au cœur de nos échanges une question
-                essentielle : celle de l'accès au dépistage néonatal et à la
-                prise en charge de la drépanocytose, dans une exigence
-                d'équité. Pendant trois jours, cliniciens, chercheurs,
-                décideurs, associations de patients et partenaires
-                confronteront leurs expériences, partageront les innovations
-                diagnostiques et thérapeutiques, et construiront ensemble des
-                recommandations concrètes, adaptées à nos réalités.
+                {t(
+                  "Cette année, nous placerons au cœur de nos échanges une question essentielle : celle de l'accès au dépistage néonatal et à la prise en charge de la drépanocytose, dans une exigence d'équité. Pendant trois jours, cliniciens, chercheurs, décideurs, associations de patients et partenaires confronteront leurs expériences, partageront les innovations diagnostiques et thérapeutiques, et construiront ensemble des recommandations concrètes, adaptées à nos réalités.",
+                  'This year, our discussions will focus on an essential question: equitable access to newborn screening and care for sickle cell disease. Over three days, clinicians, researchers, policymakers, patient associations and partners will compare their experiences, share diagnostic and therapeutic innovations, and together build practical recommendations suited to our realities.'
+                )}
               </p>
 
               <div className="my-8 p-6 sm:p-8 bg-[#fbf9f8] rounded-2xl border-l-4 border-[#8b0a1d] relative">
                 <p className="font-editorial-serif italic text-lg sm:text-xl text-[#1a1a1a] leading-relaxed">
-                  « Derrière chaque dépistage précoce, chaque protocole
-                  amélioré, chaque plaidoyer, il y a un enfant, une famille, un
-                  avenir. C'est le sens de notre engagement : un combat pour
-                  l'Espoir, une victoire pour nos enfants. »
+                  {t(
+                    "« Derrière chaque dépistage précoce, chaque protocole amélioré, chaque plaidoyer, il y a un enfant, une famille, un avenir. C'est le sens de notre engagement : un combat pour l'Espoir, une victoire pour nos enfants. »",
+                    '“Behind every early screening, every improved protocol, every act of advocacy, there is a child, a family, a future. That is the meaning of our commitment: a fight for Hope, a victory for our children.”'
+                  )}
                 </p>
               </div>
 
               <p className="font-editorial-serif italic text-xl text-[#1a1a1a]">
-                Nous vous invitons à vous joindre à nous.
+                {t('Nous vous invitons à vous joindre à nous.', 'We invite you to join us.')}
               </p>
             </div>
 
@@ -676,14 +712,14 @@ function Home() {
                     Dr Wamba Guillaume
                   </div>
                   <div className="text-xs uppercase tracking-widest text-[#555555] font-semibold">
-                    Président du GEDREPACAM
+                    {t('Président du GEDREPACAM', 'President of GEDREPACAM')}
                   </div>
                 </div>
               </div>
 
               <div className="px-5 py-2.5 rounded-full bg-[#fbf9f8] border border-[#eae4e4] flex items-center gap-2.5 text-xs text-[#555555] font-medium">
                 <span className="w-2 h-2 rounded-full bg-[#00765a]" />
-                <span>Comité d'Organisation · Congrès 2027</span>
+                <span>{t("Comité d'Organisation · Congrès 2027", 'Organising Committee · Congress 2027')}</span>
               </div>
             </div>
           </div>
@@ -698,10 +734,10 @@ function Home() {
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <p className="text-xs uppercase tracking-widest text-[#00765a] font-bold mb-2">
-              Structure Académique
+              {t('Structure Académique', 'Academic Structure')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-serif-title font-bold text-[#1a1a1a]">
-              Le congrès en chiffres et formats
+              {t('Le congrès en chiffres et formats', 'The congress in figures and formats')}
             </h2>
           </div>
 
@@ -713,14 +749,14 @@ function Home() {
                   3
                 </span>
                 <span className="text-xs font-semibold text-[#8b0a1d] uppercase tracking-wider block mt-2">
-                  Jours pleins
+                  {t('Jours pleins', 'Full days')}
                 </span>
                 <p className="text-sm text-[#1a1a1a] font-medium mt-3">
-                  25, 26 et 27 mai 2027
+                  {t('25, 26 et 27 mai 2027', '25, 26 and 27 May 2027')}
                 </p>
               </div>
               <p className="text-xs text-[#555555] mt-4 border-t border-[#eae4e4] pt-3">
-                Travaux intensifs en plénière et ateliers
+                {t('Travaux intensifs en plénière et ateliers', 'Intensive plenary sessions and workshops')}
               </p>
             </div>
 
@@ -731,14 +767,14 @@ function Home() {
                   7
                 </span>
                 <span className="text-xs font-semibold text-[#005c46] uppercase tracking-wider block mt-2">
-                  Axes majeurs
+                  {t('Axes majeurs', 'Key areas')}
                 </span>
                 <p className="text-sm text-[#1a1a1a] font-medium mt-3">
-                  Thèmes scientifiques
+                  {t('Thèmes scientifiques', 'Scientific themes')}
                 </p>
               </div>
               <p className="text-xs text-[#555555] mt-4 border-t border-[#eae4e4] pt-3">
-                Du diagnostic aux politiques de santé
+                {t('Du diagnostic aux politiques de santé', 'From diagnosis to health policy')}
               </p>
             </div>
 
@@ -749,15 +785,17 @@ function Home() {
                   <Newspaper className="w-5 h-5" />
                 </div>
                 <p className="font-editorial-serif text-base font-bold text-[#1a1a1a] leading-snug">
-                  Sessions Plénières
+                  {t('Sessions Plénières', 'Plenary Sessions')}
                 </p>
                 <p className="text-sm text-[#555555] mt-1">
-                  Conférences magistrales données par des experts
-                  internationaux reconnus.
+                  {t(
+                    'Conférences magistrales données par des experts internationaux reconnus.',
+                    'Keynote lectures by renowned international experts.'
+                  )}
                 </p>
               </div>
               <span className="text-xs text-[#00765a] font-semibold mt-4 border-t border-[#eae4e4] pt-3 block">
-                Haut niveau académique
+                {t('Haut niveau académique', 'High academic standard')}
               </span>
             </div>
 
@@ -768,15 +806,17 @@ function Home() {
                   <FileText className="w-5 h-5" />
                 </div>
                 <p className="font-editorial-serif text-base font-bold text-[#1a1a1a] leading-snug">
-                  Communications Libres
+                  {t('Communications Libres', 'Free Communications')}
                 </p>
                 <p className="text-sm text-[#555555] mt-1">
-                  Présentations orales et posters scientifiques évalués par les
-                  pairs.
+                  {t(
+                    'Présentations orales et posters scientifiques évalués par les pairs.',
+                    'Peer-reviewed oral presentations and scientific posters.'
+                  )}
                 </p>
               </div>
               <span className="text-xs text-[#c11236] font-semibold mt-4 border-t border-[#eae4e4] pt-3 block">
-                Recherche clinique
+                {t('Recherche clinique', 'Clinical research')}
               </span>
             </div>
 
@@ -787,14 +827,17 @@ function Home() {
                   <Users className="w-5 h-5" />
                 </div>
                 <p className="font-editorial-serif text-base font-bold text-[#1a1a1a] leading-snug">
-                  Symposiums Partenaires
+                  {t('Symposiums Partenaires', 'Partner Symposia')}
                 </p>
                 <p className="text-sm text-[#555555] mt-1">
-                  Ateliers de formation aux protocoles cliniques pratiques.
+                  {t(
+                    'Ateliers de formation aux protocoles cliniques pratiques.',
+                    'Hands-on training workshops on clinical protocols.'
+                  )}
                 </p>
               </div>
               <span className="text-xs text-[#00765a] font-semibold mt-4 border-t border-[#eae4e4] pt-3 block">
-                Pratiques de terrain
+                {t('Pratiques de terrain', 'Field practice')}
               </span>
             </div>
           </div>
@@ -887,21 +930,22 @@ function Home() {
           <div className="max-w-3xl mb-20">
             <div className="inline-flex items-center gap-2 mb-3">
               <span className="text-xs uppercase tracking-[0.2em] text-[#c11236] font-bold">
-                Programme Scientifique
+                {t('Programme Scientifique', 'Scientific Programme')}
               </span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-serif-title font-bold text-[#1a1a1a] leading-tight">
-              Les sept axes scientifiques au cœur du congrès
+              {t('Les sept axes scientifiques au cœur du congrès', 'The seven scientific areas at the heart of the congress')}
             </h2>
             <p className="text-[#555555] text-base sm:text-lg mt-4 leading-relaxed font-light">
-              Une approche transversale et concertée articulant politiques de
-              santé publique, avancées biotechnologiques et réalité quotidienne
-              des familles touchées.
+              {t(
+                'Une approche transversale et concertée articulant politiques de santé publique, avancées biotechnologiques et réalité quotidienne des familles touchées.',
+                'A cross-cutting, collaborative approach linking public health policy, biotechnology advances and the daily reality of affected families.'
+              )}
             </p>
           </div>
 
           <div className="divide-y divide-[#eedcdc]/80 border-t border-b border-[#eedcdc]/80">
-            {THEMES_SCIENTIFIQUES.map((theme) => (
+            {THEMES_SCIENTIFIQUES.map(pick).map((theme) => (
               <article
                 key={theme.num}
                 className="py-10 grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-baseline transition-colors duration-200 hover:bg-[#fcfaf9]/60 px-4 sm:px-6 rounded-xl"
@@ -938,7 +982,7 @@ function Home() {
               to="/programme"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-[#1a1a1a]/20 text-[#1a1a1a] hover:border-[#c11236] hover:text-[#c11236] hover:bg-[#c11236]/[0.02] font-semibold text-sm transition-all"
             >
-              <span>Consulter l'agenda détaillé des sessions</span>
+              <span>{t("Consulter l'agenda détaillé des sessions", 'View the detailed session schedule')}</span>
             </Link>
           </div>
         </div>
@@ -952,18 +996,21 @@ function Home() {
         <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs uppercase tracking-[0.25em] text-[#555555]/70 font-semibold mb-3 block">
-              Partenariats Officiels · Or, Argent &amp; Bronze
+              {t('Partenariats Officiels · Or, Argent & Bronze', 'Official Partnerships · Gold, Silver & Bronze')}
             </span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif-title font-bold text-[#1a1a1a]">
-              Sous le Haut Parrainage du Ministre de la Santé Publique et
-              l'appui de nos partenaires
+              {t(
+                "Sous le Haut Parrainage du Ministre de la Santé Publique et l'appui de nos partenaires",
+                'Under the High Patronage of the Minister of Public Health, with the support of our partners'
+              )}
             </h2>
             <div className="w-12 h-0.5 bg-[#c11236] mx-auto mt-4" />
           </div>
 
           {/* Trois niveaux bien distincts : Or, Argent, Bronze */}
           <div className="space-y-16">
-            {NIVEAUX_PARTENAIRES.map((tier) => {
+            {NIVEAUX_PARTENAIRES.map((rawTier) => {
+              const tier = pick(rawTier);
               const items = PARTENAIRES.filter((p) => p.categorie === tier.key);
               const activeGridClass =
                 items.length === 1
@@ -993,7 +1040,7 @@ function Home() {
                         <PartnerTierCard
                           key={partner.id}
                           partner={partner}
-                          tier={tier}
+                          tier={rawTier}
                         />
                       ))}
                     </div>
@@ -1009,8 +1056,10 @@ function Home() {
                           <span>{tier.badgeLabel}</span>
                         </span>
                         <p className={`text-sm font-medium ${tier.subColor}`}>
-                          Liste des {tier.titre.toLowerCase()} en cours
-                          d'officialisation.
+                          {t(
+                            `Liste des ${tier.titre.toLowerCase()} en cours d'officialisation.`,
+                            `${tier.titre} list to be announced soon.`
+                          )}
                         </p>
                       </div>
                     </div>

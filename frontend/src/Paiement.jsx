@@ -3,6 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import BadgeConference from './BadgeConference';
 import { construireUrlBadge } from './utils/badgeUtils';
+import { useLang } from './context/LanguageContext';
+
+// Adresse du serveur Laravel (variable VITE_API_URL dans frontend/.env)
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
 function Paiement() {
   const location = useLocation();
@@ -10,6 +14,7 @@ function Paiement() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState('');
   const [confirmedTransId, setConfirmedTransId] = useState(null);
+  const { t } = useLang();
 
   const donnees = location.state?.donneesInscription;
   const montant = location.state?.montant;
@@ -18,12 +23,12 @@ function Paiement() {
   if (!donnees || !montant) {
     return (
       <div className="pt-32 text-center font-sans">
-        <p>Aucune inscription en cours.</p>
+        <p>{t('Aucune inscription en cours.', 'No registration in progress.')}</p>
         <button
           onClick={() => navigate('/inscription')}
           className="mt-4 text-[#c11236] underline font-bold"
         >
-          Retour à l'inscription
+          {t("Retour à l'inscription", 'Back to registration')}
         </button>
       </div>
     );
@@ -31,48 +36,46 @@ function Paiement() {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    setMessage('Initialisation du paiement en cours...');
+    setMessage(t('Initialisation du paiement en cours...', 'Initialising payment...'));
 
     try {
-      const API_URL = import.meta.env.VITE_FAPSHI_API_URL;
-      const API_USER = import.meta.env.VITE_FAPSHI_API_USER;
-      const API_KEY = import.meta.env.VITE_FAPSHI_API_KEY;
+      // Les clés Fapshi sont sur le serveur Laravel : le site n'appelle plus Fapshi directement.
+      // Le serveur calcule aussi le montant à partir de la catégorie (backend/backend/config/congres.php).
+      const lireJson = async (res) => {
+        try {
+          return await res.json();
+        } catch {
+          return {};
+        }
+      };
 
-      const externalId = `GEDREPACAM_${Date.now()}`;
-      const userId = `USER_${Date.now()}`;
-      const cleanPhone = donnees.telephone
-        .replace(/\s+/g, '')
-        .replace(/^(\+237|237)/, '');
-
-      // 1. Appel Direct Pay Fapshi
-      const directPayResponse = await fetch(`${API_URL}/direct-pay`, {
+      // 1. Demande de paiement envoyée sur le téléphone
+      const initRes = await fetch(`${API_BASE}/api/paiements/initier`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apiuser: API_USER,
-          apikey: API_KEY
-        },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
-          amount: montant,
-          phone: cleanPhone,
-          externalId: externalId,
-          userId: userId,
-          message: `Inscription GEDREPACAM - ${donnees.email}`
+          profession: donnees.profession,
+          telephone: donnees.telephone,
+          email: donnees.email
         })
       });
 
-      const paymentData = await directPayResponse.json();
-      if (!directPayResponse.ok) {
+      const paymentData = await lireJson(initRes);
+      if (!initRes.ok || !paymentData.transId) {
         throw new Error(
-          paymentData.message || "Échec de l'initialisation du paiement direct."
+          paymentData.message || t("Échec de l'initialisation du paiement direct.", 'Failed to initialise direct payment.')
         );
       }
 
       const transId = paymentData.transId;
+      const montantPaye = paymentData.montant ?? montant;
 
       // 2. Vérification du statut
       setMessage(
-        'Veuillez valider le paiement sur votre téléphone (Code secret Mobile Money)...'
+        t(
+          'Veuillez valider le paiement sur votre téléphone (Code secret Mobile Money)...',
+          'Please confirm the payment on your phone (Mobile Money PIN)...'
+        )
       );
       let paymentStatus = 'PENDING';
       let attempts = 0;
@@ -81,7 +84,10 @@ function Paiement() {
       while (paymentStatus === 'PENDING' || paymentStatus === 'CREATED') {
         if (attempts >= maxAttempts) {
           throw new Error(
-            "Délai d'attente dépassé. Si vous avez été débité, contactez le support."
+            t(
+              "Délai d'attente dépassé. Si vous avez été débité, contactez le support.",
+              'Request timed out. If you have been charged, please contact support.'
+            )
           );
         }
 
@@ -89,30 +95,27 @@ function Paiement() {
         attempts++;
 
         const statusResponse = await fetch(
-          `${API_URL}/payment-status/${transId}`,
-          {
-            method: 'GET',
-            headers: {
-              apiuser: API_USER,
-              apikey: API_KEY
-            }
-          }
+          `${API_BASE}/api/paiements/${encodeURIComponent(transId)}/statut`,
+          { headers: { Accept: 'application/json' } }
         );
 
-        const statusData = await statusResponse.json();
-        if (statusResponse.ok) {
+        const statusData = await lireJson(statusResponse);
+        if (statusResponse.ok && statusData.status) {
           paymentStatus = statusData.status;
         }
       }
 
-      if (paymentStatus === 'FAILED') {
-        throw new Error('Le paiement a échoué ou a été annulé.');
+      if (paymentStatus !== 'SUCCESSFUL') {
+        throw new Error(t('Le paiement a échoué ou a été annulé.', 'The payment failed or was cancelled.'));
       }
 
       // 3. Archivage Drive + Nouveau Google Form + E-mail + Badge
       if (paymentStatus === 'SUCCESSFUL') {
         setMessage(
-          'Paiement reçu ! Archivage du dossier et génération du badge...'
+          t(
+            'Paiement reçu ! Archivage du dossier et génération du badge...',
+            'Payment received! Saving your file and generating your badge...'
+          )
         );
 
         let lienJustificatif = justificatif?.fileName || 'Non fourni';
@@ -179,7 +182,7 @@ function Paiement() {
               statut: donnees.statut,
               profession: donnees.profession,
               institution: donnees.institution,
-              montant: `${montant} FCFA`,
+              montant: `${montantPaye} FCFA`,
               trans_id: transId,
               badge_url: lienBadge
             },
@@ -197,7 +200,7 @@ function Paiement() {
     } catch (error) {
       console.error('Erreur de paiement', error);
       alert(
-        error.message || 'Une erreur est survenue lors du processus de paiement.'
+        error.message || t('Une erreur est survenue lors du processus de paiement.', 'An error occurred during the payment process.')
       );
     } finally {
       setIsProcessing(false);
@@ -216,37 +219,37 @@ function Paiement() {
               onClick={() => navigate('/')}
               className="text-xs font-bold text-gray-500 hover:text-gray-800 underline"
             >
-              Terminer et retourner à l'accueil
+              {t("Terminer et retourner à l'accueil", 'Finish and return to home')}
             </button>
           </div>
         </div>
       ) : (
         <div className="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-md mx-auto">
           <h2 className="text-2xl font-bold text-[#c11236] mb-6 text-center">
-            Règlement
+            {t('Règlement', 'Payment')}
           </h2>
 
           <div className="bg-gray-50 p-4 rounded-md mb-6">
-            <p className="text-sm text-gray-500 mb-1">Candidat :</p>
+            <p className="text-sm text-gray-500 mb-1">{t('Candidat :', 'Applicant:')}</p>
             <p className="font-bold text-gray-800 mb-4">
               {donnees.titre} {donnees.prenoms} {donnees.noms}
             </p>
 
-            <p className="text-sm text-gray-500 mb-1">Profession :</p>
+            <p className="text-sm text-gray-500 mb-1">{t('Profession :', 'Profession:')}</p>
             <p className="font-bold text-gray-800 mb-4">{donnees.profession}</p>
 
-            <p className="text-sm text-gray-500 mb-1">Justificatif joint :</p>
+            <p className="text-sm text-gray-500 mb-1">{t('Justificatif joint :', 'Supporting document:')}</p>
             <p className="font-bold text-gray-800 mb-4 truncate">
-              {justificatif?.fileName || 'Aucun fichier'}
+              {justificatif?.fileName || t('Aucun fichier', 'No file')}
             </p>
 
             <p className="text-sm text-gray-500 mb-1">
-              E-mail de confirmation :
+              {t('E-mail de confirmation :', 'Confirmation email:')}
             </p>
             <p className="font-bold text-gray-800 mb-4">{donnees.email}</p>
 
             <div className="border-t border-gray-200 pt-4 mt-2 flex justify-between items-center">
-              <span className="text-gray-600 font-bold">Total à payer</span>
+              <span className="text-gray-600 font-bold">{t('Total à payer', 'Total to pay')}</span>
               <span className="text-xl font-extrabold text-[#00765a]">
                 {montant} FCFA
               </span>
@@ -268,11 +271,11 @@ function Paiement() {
                 : 'bg-[#c11236] hover:bg-[#9c0e2a] hover:shadow-md'
             }`}
           >
-            {isProcessing ? 'Traitement en cours...' : 'Payer maintenant'}
+            {isProcessing ? t('Traitement en cours...', 'Processing...') : t('Payer maintenant', 'Pay now')}
           </button>
 
           <p className="text-center text-xs text-gray-400 mt-4">
-            Environnement Sandbox - Utilisez le numéro de test 670000000
+            {t('Environnement Sandbox - Utilisez le numéro de test 670000000', 'Sandbox environment - Use test number 670000000')}
           </p>
         </div>
       )}

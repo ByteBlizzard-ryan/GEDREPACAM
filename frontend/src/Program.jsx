@@ -12,6 +12,8 @@ import {
   Calendar,
   Layers
 } from 'lucide-react';
+import { useLang } from './context/LanguageContext';
+import { translateProgram } from './i18n/programEn';
 
 const FILTER_CATEGORIES = [
   { id: 'all', label: 'Tout afficher', dot: null },
@@ -945,6 +947,12 @@ const PROGRAM_DAYS = [
 ];
 
 function Program() {
+  const { t, lang } = useLang();
+  // Données du programme dans la langue active (dictionnaire : src/i18n/programEn.js)
+  const programDays = useMemo(
+    () => (lang === 'en' ? translateProgram(PROGRAM_DAYS) : PROGRAM_DAYS),
+    [lang]
+  );
   // 'all' affiche les 3 journées à égalité ; 'jour-1' | 'jour-2' | 'jour-3' filtre sur une journée
   const [selectedDay, setSelectedDay] = useState('all');
   const [activeFilter, setActiveFilter] = useState('all');
@@ -976,7 +984,7 @@ function Program() {
   };
 
   const filteredDays = useMemo(() => {
-    return PROGRAM_DAYS.filter(
+    return programDays.filter(
       (day) => selectedDay === 'all' || day.id === selectedDay
     )
       .map((day) => {
@@ -998,7 +1006,7 @@ function Program() {
         return { ...day, blocks: filteredBlocks };
       })
       .filter((day) => day.blocks.length > 0);
-  }, [selectedDay, activeFilter, normalizedQuery]);
+  }, [programDays, selectedDay, activeFilter, normalizedQuery]);
 
   const handleToggleDay = (dayId) => {
     setSelectedDay((prev) => (prev === dayId ? 'all' : dayId));
@@ -1041,36 +1049,41 @@ function Program() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium tracking-wide mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c11236]" />
             <span>
-              Sous le Haut Parrainage du Ministre de la Santé Publique
+              {t('Sous le Haut Parrainage du Ministre de la Santé Publique', 'Under the High Patronage of the Minister of Public Health')}
             </span>
           </div>
 
           <div className="max-w-4xl">
             <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-serif-title font-bold tracking-tight text-white leading-[1.15] mb-4">
-              Programme scientifique
+              {t('Programme scientifique', 'Scientific programme')}
             </h1>
 
             <p className="text-white/90 text-base sm:text-lg font-medium mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
               <span>
-                5<sup>e</sup> Congrès International de la Drépanocytose
+                {t(
+                  <>5<sup>e</sup> Congrès International de la Drépanocytose</>,
+                  <>5<sup>th</sup> International Sickle Cell Disease Congress</>
+                )}
               </span>
               <span className="text-white/40">·</span>
-              <span>25 – 27 mai 2027</span>
+              <span>{t('25 – 27 mai 2027', '25 – 27 May 2027')}</span>
               <span className="text-white/40">·</span>
               <span className="font-normal text-white/80">
-                Palais des Congrès de Yaoundé
+                {t('Palais des Congrès de Yaoundé', 'Yaoundé Conference Centre')}
               </span>
             </p>
 
             <blockquote className="text-white/85 text-sm sm:text-base font-editorial-serif italic max-w-3xl leading-relaxed border-l-2 border-[#c11236] pl-4 py-0.5">
-              « Accès au dépistage néonatal et à la prise en charge de la
-              drépanocytose : équité, défis, innovations et perspectives »
+              {t(
+                '« Accès au dépistage néonatal et à la prise en charge de la drépanocytose : équité, défis, innovations et perspectives »',
+                '“Access to newborn screening and care for sickle cell disease: equity, challenges, innovation and outlook”'
+              )}
             </blockquote>
 
             <p className="mt-4 text-xs text-white/65 tracking-wide uppercase flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5 opacity-80 flex-shrink-0" />
               <span>
-                Programme scientifique prévisionnel des 3 journées
+                {t('Programme scientifique prévisionnel des 3 journées', 'Provisional scientific programme for the 3 days')}
               </span>
             </p>
           </div>
@@ -1082,7 +1095,7 @@ function Program() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#555555] font-semibold">
             <Calendar className="w-3.5 h-3.5 text-[#c11236]" />
-            <span>Choisir une journée de conférence</span>
+            <span>{t('Choisir une journée de conférence', 'Choose a conference day')}</span>
           </div>
 
           <button
@@ -1095,12 +1108,12 @@ function Program() {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Afficher les 3 journées</span>
+            <span>{t('Afficher les 3 journées', 'Show all 3 days')}</span>
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PROGRAM_DAYS.map((day) => {
+          {programDays.map((day) => {
             const isSelected = selectedDay === day.id;
             return (
               <button
@@ -1155,10 +1168,10 @@ function Program() {
         {filteredDays.length === 0 && (
           <div className="my-6 p-10 rounded-2xl bg-[#f8f8fa] border border-[#dce0e8] text-center space-y-3">
             <p className="font-editorial-serif text-xl font-bold text-[#1a1a1a]">
-              Aucune session ne correspond à votre recherche
+              {t('Aucune session ne correspond à votre recherche', 'No session matches your search')}
             </p>
             <p className="text-sm text-[#555555]">
-              Essayez un autre mot-clé ou réinitialisez les filtres affichés.
+              {t('Essayez un autre mot-clé ou réinitialisez les filtres affichés.', 'Try another keyword or reset the filters.')}
             </p>
             <button
               type="button"
@@ -1170,7 +1183,7 @@ function Program() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c11236] text-white text-xs font-semibold hover:bg-[#8b0a1d] transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Réinitialiser les filtres</span>
+              <span>{t('Réinitialiser les filtres', 'Reset filters')}</span>
             </button>
           </div>
         )}
@@ -1199,9 +1212,9 @@ function Program() {
 
             {/* En-tête des colonnes sur ordinateur */}
             <div className="hidden lg:grid lg:grid-cols-12 gap-6 pb-3 text-xs font-mono tracking-wider uppercase text-[#555555]/80 border-b border-[#dce0e8]/60 px-4">
-              <div className="col-span-2">Horaire</div>
-              <div className="col-span-7">Présentation &amp; Thématique</div>
-              <div className="col-span-3">Intervenant / Modération</div>
+              <div className="col-span-2">{t('Horaire', 'Time')}</div>
+              <div className="col-span-7">{t('Présentation & Thématique', 'Presentation & Topic')}</div>
+              <div className="col-span-3">{t('Intervenant / Modération', 'Speaker / Chair')}</div>
             </div>
 
             <div className="space-y-8 mt-6">
@@ -1276,7 +1289,7 @@ function Program() {
                                 {item.speaker && (
                                   <p>
                                     <span className="font-semibold text-[#1a1a1a]">
-                                      Intervenant :
+                                      {t('Intervenant :', 'Speaker:')}
                                     </span>{' '}
                                     {item.speaker}
                                   </p>
@@ -1284,7 +1297,7 @@ function Program() {
                                 {item.moderators && (
                                   <p>
                                     <span className="font-semibold text-[#1a1a1a]">
-                                      Modération :
+                                      {t('Modération :', 'Chair:')}
                                     </span>{' '}
                                     {item.moderators}
                                   </p>
@@ -1347,7 +1360,7 @@ function Program() {
                       </div>
                       {block.participants && (
                         <span className="hidden sm:inline-block text-xs font-medium text-[#555555] bg-white px-3 py-1 rounded-full border border-[#dce0e8]">
-                          Participants : {block.participants}
+                          {t('Participants :', 'Participants:')} {block.participants}
                         </span>
                       )}
                     </div>
@@ -1381,7 +1394,7 @@ function Program() {
                       </div>
                       {block.participants && (
                         <span className="hidden sm:inline-block text-xs font-medium text-[#555555] bg-white px-3 py-1 rounded-full border border-[#dce0e8]">
-                          Participants : {block.participants}
+                          {t('Participants :', 'Participants:')} {block.participants}
                         </span>
                       )}
                     </div>
@@ -1539,7 +1552,7 @@ function Program() {
                                 {item.speaker && (
                                   <p>
                                     <span className="font-semibold text-[#1a1a1a]">
-                                      Intervenant :
+                                      {t('Intervenant :', 'Speaker:')}
                                     </span>{' '}
                                     {item.speaker}
                                   </p>
@@ -1547,7 +1560,7 @@ function Program() {
                                 {item.moderators && (
                                   <p>
                                     <span className="font-semibold text-[#1a1a1a]">
-                                      Modération :
+                                      {t('Modération :', 'Chair:')}
                                     </span>{' '}
                                     {item.moderators}
                                   </p>

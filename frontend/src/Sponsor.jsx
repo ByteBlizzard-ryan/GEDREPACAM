@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import logoEbPartner from './assets/eb-partner.jpeg';
+import { useLang } from './context/LanguageContext';
 // import logoPad from './assets/pad.png';
 // import logoSabc from './assets/sabc.png';
 // import logoCnps from './assets/cnps.png';
@@ -27,7 +28,13 @@ const PARTENAIRES_OFFICIELS = [
     siege: 'Cameroun',
     logoSrc: logoEbPartner,
     description:
-      'Entreprise partenaire engagée aux côtés du GEDREPACAM pour la réussite organisationnelle et le rayonnement de cette 5e édition internationale à Yaoundé.'
+      'Entreprise partenaire engagée aux côtés du GEDREPACAM pour la réussite organisationnelle et le rayonnement de cette 5e édition internationale à Yaoundé.',
+    en: {
+      secteur: 'Official Partner · Congress 2027',
+      siege: 'Cameroon',
+      description:
+        'A partner company working alongside GEDREPACAM to ensure the organisational success and visibility of this 5th international edition in Yaoundé.'
+    }
   }
 ];
 
@@ -39,6 +46,7 @@ const NIVEAUX_SPONSORS = [
     titre: 'Partenaires Or',
     badgeLabel: 'Catégorie Or',
     sousTitre: 'Partenariat Majeur · Visibilité de Premier Plan',
+    en: { titre: 'Gold Partners', badgeLabel: 'Gold Tier', sousTitre: 'Major Partnership · Top-tier Visibility' },
     headerLine: 'from-amber-400 via-yellow-500 to-amber-600',
     pillStyle:
       'bg-gradient-to-r from-amber-500 to-yellow-600 text-white shadow-xs',
@@ -57,6 +65,7 @@ const NIVEAUX_SPONSORS = [
     titre: 'Partenaires Argent',
     badgeLabel: 'Catégorie Argent',
     sousTitre: 'Partenariat Institutionnel & Technique',
+    en: { titre: 'Silver Partners', badgeLabel: 'Silver Tier', sousTitre: 'Institutional & Technical Partnership' },
     headerLine: 'from-slate-300 via-slate-400 to-slate-500',
     pillStyle:
       'bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-xs',
@@ -75,6 +84,7 @@ const NIVEAUX_SPONSORS = [
     titre: 'Partenaires Bronze',
     badgeLabel: 'Catégorie Bronze',
     sousTitre: 'Soutien Officiel du Congrès',
+    en: { titre: 'Bronze Partners', badgeLabel: 'Bronze Tier', sousTitre: 'Official Congress Support' },
     headerLine: 'from-amber-700 via-orange-700 to-amber-800',
     pillStyle:
       'bg-gradient-to-r from-amber-700 to-orange-800 text-white shadow-xs',
@@ -91,12 +101,13 @@ const NIVEAUX_SPONSORS = [
 
 function SponsorVisual({ sponsor }) {
   const [imgError, setImgError] = useState(false);
+  const { t } = useLang();
 
   if (!imgError && sponsor.logoSrc) {
     return (
       <img
         src={sponsor.logoSrc}
-        alt={`Logo officiel — ${sponsor.nom}`}
+        alt={`${t('Logo officiel', 'Official logo')} — ${sponsor.nom}`}
         onError={() => setImgError(true)}
         className="max-h-36 sm:max-h-40 w-auto max-w-[88%] object-contain transition-transform duration-500 group-hover:scale-105"
       />
@@ -116,6 +127,7 @@ function SponsorVisual({ sponsor }) {
 }
 
 function Informations() {
+  const { t, pick } = useLang();
   return (
     <main className="relative overflow-x-clip w-full bg-white text-[#1a1a1a] selection:bg-[#c11236] selection:text-white">
       {/* 1. EN-TÊTE ÉDITORIAL BORDEAUX AVEC HÉMATIES EN FILIGRANE */}
@@ -158,7 +170,7 @@ function Informations() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           {/* Fil d'Ariane */}
           <nav
-            aria-label="Breadcrumb"
+            aria-label={t("Fil d'Ariane", 'Breadcrumb')}
             className="flex items-center gap-1.5 text-white/75 text-xs font-medium mb-6"
           >
             <Link
@@ -166,11 +178,11 @@ function Informations() {
               className="hover:text-white transition-colors inline-flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
-              <span>Accueil</span>
+              <span>{t('Accueil', 'Home')}</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-white/40" />
             <span className="text-white font-semibold">
-              Sponsors &amp; Partenaires
+              {t('Sponsors & Partenaires', 'Sponsors & Partners')}
             </span>
           </nav>
 
@@ -179,20 +191,27 @@ function Informations() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium tracking-wide mb-5">
                 <Handshake className="w-3.5 h-3.5 text-emerald-300" />
                 <span>
-                  Partenariats Or, Argent &amp; Bronze · GEDREPACAM 2027
+                  {t('Partenariats Or, Argent & Bronze · GEDREPACAM 2027', 'Gold, Silver & Bronze Partnerships · GEDREPACAM 2027')}
                 </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-serif-title font-bold tracking-tight text-white leading-[1.15] mb-4">
-                Nos Sponsors &amp; Partenaires
+                {t('Nos Sponsors & Partenaires', 'Our Sponsors & Partners')}
               </h1>
 
               <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-3xl">
-                Le 5<sup>e</sup> Congrès International de la Drépanocytose
-                s’appuie sur l’engagement d’institutions et d’entreprises
-                citoyennes mobilisées à travers trois niveaux de partenariat
-                officiel : <strong>Or</strong>, <strong>Argent</strong> et{' '}
-                <strong>Bronze</strong>.
+                {t(
+                  <>
+                    Le 5<sup>e</sup> Congrès International de la Drépanocytose s’appuie sur l’engagement
+                    d’institutions et d’entreprises citoyennes mobilisées à travers trois niveaux de partenariat
+                    officiel : <strong>Or</strong>, <strong>Argent</strong> et <strong>Bronze</strong>.
+                  </>,
+                  <>
+                    The 5<sup>th</sup> International Sickle Cell Disease Congress relies on the commitment of
+                    socially responsible institutions and companies through three levels of official
+                    partnership: <strong>Gold</strong>, <strong>Silver</strong> and <strong>Bronze</strong>.
+                  </>
+                )}
               </p>
             </div>
 
@@ -201,9 +220,9 @@ function Informations() {
               <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
                 <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Partenariats Actifs
+                  {t('Partenariats Actifs', 'Active Partnerships')}
                 </span>
-                <span>25 – 27 Mai 2027</span>
+                <span>{t('25 – 27 Mai 2027', '25 – 27 May 2027')}</span>
               </div>
               <div className="pt-3 border-t border-white/15 flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-white/10 text-emerald-300 shrink-0 mt-0.5">
@@ -211,13 +230,13 @@ function Informations() {
                 </div>
                 <div>
                   <span className="text-[11px] font-mono uppercase tracking-wider text-white/70 block">
-                    Engagement Officiel
+                    {t('Engagement Officiel', 'Official Commitment')}
                   </span>
                   <div className="font-editorial-serif text-lg sm:text-xl font-bold text-white leading-snug mt-0.5">
-                    Palais des Congrès de Yaoundé
+                    {t('Palais des Congrès de Yaoundé', 'Yaoundé Conference Centre')}
                   </div>
                   <div className="text-xs text-white/75 mt-0.5">
-                    Sous le Haut Parrainage du MINSANTE
+                    {t('Sous le Haut Parrainage du MINSANTE', 'Under the High Patronage of MINSANTE')}
                   </div>
                 </div>
               </div>
@@ -263,15 +282,22 @@ function Informations() {
               <div>
                 <div className="inline-flex items-center gap-1.5 text-xs font-mono text-[#c11236] font-bold uppercase tracking-wider mb-2">
                   <Award className="w-4 h-4" />
-                  <span>Institutions &amp; Entreprises</span>
+                  <span>{t('Institutions & Entreprises', 'Institutions & Companies')}</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-serif-title font-bold text-[#1a1a1a] leading-tight">
-                  Partenaires Officiels du Congrès
+                  {t('Partenaires Officiels du Congrès', 'Official Congress Partners')}
                 </h2>
                 <p className="text-sm sm:text-base text-[#555555] mt-3 leading-relaxed">
-                  Le comité d’organisation remercie chaleureusement les
-                  entreprises et institutions qui accompagnent cette 5
-                  <sup>e</sup> édition internationale.
+                  {t(
+                    <>
+                      Le comité d’organisation remercie chaleureusement les entreprises et institutions qui
+                      accompagnent cette 5<sup>e</sup> édition internationale.
+                    </>,
+                    <>
+                      The organising committee warmly thanks the companies and institutions supporting this
+                      5<sup>th</sup> international edition.
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -279,7 +305,7 @@ function Informations() {
               <div className="bg-white rounded-2xl border border-[#dce0e8] p-5 space-y-4 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono uppercase tracking-wider text-[#555555] font-semibold">
-                    Partenaires confirmés
+                    {t('Partenaires confirmés', 'Confirmed partners')}
                   </span>
                   <span className="font-mono text-lg font-bold text-[#c11236] tabular-nums">
                     {String(PARTENAIRES_OFFICIELS.length).padStart(2, '0')}
@@ -287,7 +313,7 @@ function Informations() {
                 </div>
 
                 <div className="pt-3 border-t border-[#dce0e8]/70 space-y-2.5">
-                  {NIVEAUX_SPONSORS.map((tier) => {
+                  {NIVEAUX_SPONSORS.map(pick).map((tier) => {
                     const count = PARTENAIRES_OFFICIELS.filter(
                       (p) => p.categorie === tier.key
                     ).length;
@@ -307,7 +333,7 @@ function Informations() {
                         <span className="font-mono font-bold text-[#555555]">
                           {count > 0
                             ? String(count).padStart(2, '0')
-                            : 'À venir'}
+                            : t('À venir', 'Coming soon')}
                         </span>
                       </a>
                     );
@@ -316,14 +342,14 @@ function Informations() {
 
                 <div className="pt-3 border-t border-[#dce0e8]/70 flex items-center gap-2 text-xs text-[#00765a] font-medium">
                   <Sparkles className="w-4 h-4 shrink-0" />
-                  <span>Liste évolutive au fil des conventions signées</span>
+                  <span>{t('Liste évolutive au fil des conventions signées', 'List updated as agreements are signed')}</span>
                 </div>
               </div>
             </aside>
 
             {/* Colonne droite : Niveaux Or, Argent & Bronze */}
             <div className="lg:col-span-8 space-y-14">
-              {NIVEAUX_SPONSORS.map((tier) => {
+              {NIVEAUX_SPONSORS.map(pick).map((tier) => {
                 const items = PARTENAIRES_OFFICIELS.filter(
                   (p) => p.categorie === tier.key
                 );
@@ -358,7 +384,7 @@ function Informations() {
 
                     {items.length > 0 ? (
                       <div className="space-y-6">
-                        {items.map((sponsor, index) => (
+                        {items.map(pick).map((sponsor, index) => (
                           <article
                             key={sponsor.id}
                             className={`group bg-white rounded-3xl border-2 ${tier.cardBorder} shadow-xs hover:shadow-lg transition-all duration-300 overflow-hidden relative`}
@@ -444,9 +470,10 @@ function Informations() {
                           <span>{tier.badgeLabel}</span>
                         </span>
                         <p className={`text-sm font-medium ${tier.accentText}`}>
-                          Les partenaires de la {tier.badgeLabel.toLowerCase()}{' '}
-                          seront annoncés prochainement au fil de la signature
-                          des conventions.
+                          {t(
+                            `Les partenaires de la ${tier.badgeLabel.toLowerCase()} seront annoncés prochainement au fil de la signature des conventions.`,
+                            `${tier.badgeLabel} partners will be announced soon as agreements are signed.`
+                          )}
                         </p>
                       </div>
                     )}
@@ -475,16 +502,19 @@ function Informations() {
             <div className="max-w-2xl space-y-3">
               <span className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-emerald-300 font-bold">
                 <Handshake className="w-4 h-4" />
-                <span>Rejoindre nos partenaires</span>
+                <span>{t('Rejoindre nos partenaires', 'Join our partners')}</span>
               </span>
               <h2 className="font-editorial-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
-                Associez votre institution au 5<sup>e</sup> Congrès GEDREPACAM
+                {t(
+                  <>Associez votre institution au 5<sup>e</sup> Congrès GEDREPACAM</>,
+                  <>Partner your institution with the 5<sup>th</sup> GEDREPACAM Congress</>
+                )}
               </h2>
               <p className="text-sm sm:text-base text-white/85 leading-relaxed">
-                Laboratoires pharmaceutiques, établissements de santé,
-                organisations internationales et entreprises : bénéficiez d’une
-                visibilité privilégiée auprès des décideurs et praticiens à
-                Yaoundé.
+                {t(
+                  'Laboratoires pharmaceutiques, établissements de santé, organisations internationales et entreprises : bénéficiez d’une visibilité privilégiée auprès des décideurs et praticiens à Yaoundé.',
+                  'Pharmaceutical companies, healthcare facilities, international organisations and businesses: gain prime visibility with decision-makers and practitioners in Yaoundé.'
+                )}
               </p>
             </div>
 
@@ -493,7 +523,7 @@ function Informations() {
                 to="/contact"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white text-[#8b0a1d] hover:bg-[#f8f8fa] text-sm font-bold transition-colors shadow-xs"
               >
-                <span>S'inscrire comme partenaire</span>
+                <span>{t("S'inscrire comme partenaire", 'Become a partner')}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

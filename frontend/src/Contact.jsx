@@ -20,17 +20,19 @@ import {
   FileText,
   Globe
 } from 'lucide-react';
+import { useLang } from './context/LanguageContext';
 
 const OFFICIAL_EMAIL = 'gedrepacam237@gmail.com';
 
 const SUBJECT_LABELS = {
-  inscription: 'Inscription & Accréditation',
-  soumission: 'Soumission de résumé scientifique',
-  sponsoring: 'Sponsoring & Partenariat institutionnel',
-  autre: 'Autre demande'
+  inscription: { fr: 'Inscription & Accréditation', en: 'Registration & Accreditation' },
+  soumission: { fr: 'Soumission de résumé scientifique', en: 'Scientific abstract submission' },
+  sponsoring: { fr: 'Sponsoring & Partenariat institutionnel', en: 'Sponsorship & Institutional partnership' },
+  autre: { fr: 'Autre demande', en: 'Other request' }
 };
 
 function Contact() {
+  const { t, lang } = useLang();
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -40,17 +42,17 @@ function Contact() {
     const email = String(formData.get('email') || '').trim();
     const subjectKey = String(formData.get('subject') || '').trim();
     const message = String(formData.get('message') || '').trim();
-    const subjectLabel = SUBJECT_LABELS[subjectKey] || 'Demande en ligne';
+    const subjectLabel = SUBJECT_LABELS[subjectKey]?.[lang] || t('Demande en ligne', 'Online request');
 
     const emailSubject = `[GEDREPACAM 2027] ${subjectLabel} — ${fullname}`;
     const emailBody = [
-      'Bonjour le secrétariat GEDREPACAM,',
+      t('Bonjour le secrétariat GEDREPACAM,', 'Dear GEDREPACAM Secretariat,'),
       '',
-      `Nom complet : ${fullname}`,
-      `Email de contact : ${email}`,
-      `Objet : ${subjectLabel}`,
+      `${t('Nom complet :', 'Full name:')} ${fullname}`,
+      `${t('Email de contact :', 'Contact email:')} ${email}`,
+      `${t('Objet :', 'Subject:')} ${subjectLabel}`,
       '',
-      'Message :',
+      t('Message :', 'Message:'),
       message
     ].join('\n');
 
@@ -104,7 +106,7 @@ function Contact() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
           {/* Fil d'Ariane */}
           <nav
-            aria-label="Breadcrumb"
+            aria-label={t("Fil d'Ariane", 'Breadcrumb')}
             className="flex items-center gap-1.5 text-white/75 text-xs font-medium mb-6"
           >
             <Link
@@ -112,7 +114,7 @@ function Contact() {
               className="hover:text-white transition-colors inline-flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
-              <span>Accueil</span>
+              <span>{t('Accueil', 'Home')}</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-white/40" />
             <span className="text-white font-semibold">Contact</span>
@@ -123,20 +125,30 @@ function Contact() {
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-xs font-medium tracking-wide mb-5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
                 <span>
-                  Secrétariat &amp; Permanence · Délégués, Orateurs &amp;
-                  Partenaires
+                  {t(
+                    'Secrétariat & Permanence · Délégués, Orateurs & Partenaires',
+                    'Secretariat & Helpdesk · Delegates, Speakers & Partners'
+                  )}
                 </span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] font-serif-title font-bold tracking-tight text-white leading-[1.15] mb-4">
-                Contactez-nous
+                {t('Contactez-nous', 'Contact us')}
               </h1>
 
               <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-3xl">
-                Le secrétariat d’organisation du 5<sup>e</sup> Congrès
-                International de la Drépanocytose est à votre disposition pour
-                toute question relative aux inscriptions, aux soumissions
-                scientifiques ou aux conventions de partenariat.
+                {t(
+                  <>
+                    Le secrétariat d’organisation du 5<sup>e</sup> Congrès International de la Drépanocytose
+                    est à votre disposition pour toute question relative aux inscriptions, aux soumissions
+                    scientifiques ou aux conventions de partenariat.
+                  </>,
+                  <>
+                    The organising secretariat of the 5<sup>th</sup> International Sickle Cell Disease
+                    Congress is available to answer any questions about registration, scientific submissions
+                    or partnership agreements.
+                  </>
+                )}
               </p>
             </div>
 
@@ -145,7 +157,7 @@ function Contact() {
               <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/80">
                 <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Permanence Active
+                  {t('Permanence Active', 'Helpdesk Open')}
                 </span>
                 <span>GMT+1 · Yaoundé</span>
               </div>
@@ -155,13 +167,13 @@ function Contact() {
                 </div>
                 <div>
                   <span className="text-[11px] font-mono uppercase tracking-wider text-white/70 block">
-                    Engagement de réponse
+                    {t('Engagement de réponse', 'Response commitment')}
                   </span>
                   <div className="font-editorial-serif text-lg sm:text-xl font-bold text-white leading-snug mt-0.5">
-                    Délai moyen &lt; 48h ouvrées
+                    {t('Délai moyen < 48h ouvrées', 'Average reply < 48 working hours')}
                   </div>
                   <div className="text-xs text-white/75 mt-0.5">
-                    Lundi au Vendredi · 08h00 – 18h00
+                    {t('Lundi au Vendredi · 08h00 – 18h00', 'Monday to Friday · 8:00 am – 6:00 pm')}
                   </div>
                 </div>
               </div>
@@ -213,14 +225,16 @@ function Contact() {
                   </div>
                   <div className="flex flex-col gap-1.5 min-w-0">
                     <span className="text-[10px] font-mono uppercase tracking-wider text-[#00765a] font-bold">
-                      Courrier électronique &amp; Portail
+                      {t('Courrier électronique & Portail', 'Email & Website')}
                     </span>
                     <h2 className="font-editorial-serif text-xl font-bold text-[#1a1a1a]">
-                      Secrétariat d’organisation
+                      {t('Secrétariat d’organisation', 'Organising secretariat')}
                     </h2>
                     <p className="text-sm text-[#555555] leading-relaxed">
-                      Pour toute demande liée aux inscriptions, à la logistique
-                      d’accueil et aux sessions scientifiques.
+                      {t(
+                        'Pour toute demande liée aux inscriptions, à la logistique d’accueil et aux sessions scientifiques.',
+                        'For any request about registration, on-site logistics and scientific sessions.'
+                      )}
                     </p>
                     <div className="pt-2 flex flex-col gap-1.5">
                       <a
@@ -252,14 +266,16 @@ function Contact() {
                   </div>
                   <div className="flex flex-col gap-1.5 min-w-0">
                     <span className="text-[10px] font-mono uppercase tracking-wider text-[#c11236] font-bold">
-                      Standard &amp; Délégations
+                      {t('Standard & Délégations', 'Switchboard & Delegations')}
                     </span>
                     <h2 className="font-editorial-serif text-xl font-bold text-[#1a1a1a]">
-                      Assistance téléphonique
+                      {t('Assistance téléphonique', 'Phone support')}
                     </h2>
                     <p className="text-sm text-[#555555] leading-relaxed">
-                      Ligne dédiée aux congressistes, intervenants et
-                      délégations internationales.
+                      {t(
+                        'Ligne dédiée aux congressistes, intervenants et délégations internationales.',
+                        'Dedicated line for attendees, speakers and international delegations.'
+                      )}
                     </p>
                     <div className="pt-2 flex flex-col gap-1.5">
                       <a
@@ -278,7 +294,7 @@ function Contact() {
                       </a>
                       <div className="flex items-center gap-2 text-[#555555] text-xs pt-1.5 border-t border-[#dce0e8]/70 mt-1">
                         <Calendar className="w-3.5 h-3.5 text-[#00765a] shrink-0" />
-                        <span>Lundi au Vendredi, 08h00 – 18h00 (GMT+1)</span>
+                        <span>{t('Lundi au Vendredi, 08h00 – 18h00 (GMT+1)', 'Monday to Friday, 8:00 am – 6:00 pm (GMT+1)')}</span>
                       </div>
                     </div>
                   </div>
@@ -291,21 +307,27 @@ function Contact() {
                 <div className="space-y-2.5 pl-2">
                   <div className="inline-flex items-center gap-2 text-[#8b0a1d] text-xs font-mono font-bold uppercase tracking-wider">
                     <Landmark className="w-4 h-4" />
-                    <span>Délégations &amp; Protocoles Officiels</span>
+                    <span>{t('Délégations & Protocoles Officiels', 'Delegations & Official Protocol')}</span>
                   </div>
                   <p className="text-xs sm:text-sm text-[#555555] leading-relaxed">
-                    Pour les courriers ministériels, ordres professionnels et
-                    délégations diplomatiques, les correspondances officielles
-                    sont traitées conjointement avec le haut patronage du{' '}
-                    <strong className="text-[#1a1a1a]">
-                      MINSANTE Cameroun
-                    </strong>{' '}
-                    et la coordination scientifique du{' '}
-                    <strong className="text-[#1a1a1a]">GEDREPACAM</strong>.
+                    {t(
+                      <>
+                        Pour les courriers ministériels, ordres professionnels et délégations diplomatiques, les
+                        correspondances officielles sont traitées conjointement avec le haut patronage du{' '}
+                        <strong className="text-[#1a1a1a]">MINSANTE Cameroun</strong> et la coordination
+                        scientifique du <strong className="text-[#1a1a1a]">GEDREPACAM</strong>.
+                      </>,
+                      <>
+                        Letters from ministries, professional bodies and diplomatic delegations are handled
+                        jointly by the high patronage of{' '}
+                        <strong className="text-[#1a1a1a]">MINSANTE Cameroon</strong> and the scientific
+                        coordination of <strong className="text-[#1a1a1a]">GEDREPACAM</strong>.
+                      </>
+                    )}
                   </p>
                   <div className="pt-1 flex items-center gap-1.5 text-[#00765a] text-xs font-semibold">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
-                    <span>Protocole certifié GEDREPACAM Yaoundé</span>
+                    <span>{t('Protocole certifié GEDREPACAM Yaoundé', 'Certified GEDREPACAM Yaoundé protocol')}</span>
                   </div>
                 </div>
               </div>
@@ -320,15 +342,16 @@ function Contact() {
                 <div className="p-7 sm:p-10">
                   <div className="mb-8">
                     <span className="text-xs font-mono uppercase tracking-wider text-[#c11236] font-bold block mb-1.5">
-                      Messagerie directe
+                      {t('Messagerie directe', 'Direct message')}
                     </span>
                     <h2 className="font-editorial-serif text-2xl sm:text-3xl font-bold text-[#1a1a1a] tracking-tight">
-                      Préparer votre e-mail au secrétariat
+                      {t('Préparer votre e-mail au secrétariat', 'Prepare your email to the secretariat')}
                     </h2>
                     <p className="text-sm text-[#555555] mt-1.5">
-                      Renseignez les champs ci-dessous : votre application de
-                      messagerie ou votre webmail s’ouvrira automatiquement avec
-                      le message prêt à être envoyé à{' '}
+                      {t(
+                        'Renseignez les champs ci-dessous : votre application de messagerie ou votre webmail s’ouvrira automatiquement avec le message prêt à être envoyé à',
+                        'Fill in the fields below: your email app or webmail will open automatically with the message ready to send to'
+                      )}{' '}
                       <span className="font-medium text-[#1a1a1a]">
                         gedrepacam237@gmail.com
                       </span>
@@ -344,7 +367,7 @@ function Contact() {
                           className="text-xs font-mono uppercase tracking-wider text-[#1a1a1a] font-bold flex items-center gap-1"
                           htmlFor="fullname"
                         >
-                          <span>Nom complet</span>
+                          <span>{t('Nom complet', 'Full name')}</span>
                           <span className="text-[#c11236]">*</span>
                         </label>
                         <div className="relative flex items-center">
@@ -353,7 +376,7 @@ function Contact() {
                             className="w-full pl-10 pr-4 py-3 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all"
                             id="fullname"
                             name="fullname"
-                            placeholder="Ex: Dr. Martin Eboa"
+                            placeholder={t('Ex : Dr. Martin Eboa', 'e.g. Dr. Martin Eboa')}
                             required
                             type="text"
                           />
@@ -366,7 +389,7 @@ function Contact() {
                           className="text-xs font-mono uppercase tracking-wider text-[#1a1a1a] font-bold flex items-center gap-1"
                           htmlFor="email"
                         >
-                          <span>Adresse e-mail</span>
+                          <span>{t('Adresse e-mail', 'Email address')}</span>
                           <span className="text-[#c11236]">*</span>
                         </label>
                         <div className="relative flex items-center">
@@ -375,7 +398,7 @@ function Contact() {
                             className="w-full pl-10 pr-4 py-3 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all"
                             id="email"
                             name="email"
-                            placeholder="votre.email@institut.cm"
+                            placeholder={t('votre.email@institut.cm', 'your.email@institute.org')}
                             required
                             type="email"
                           />
@@ -389,7 +412,7 @@ function Contact() {
                         className="text-xs font-mono uppercase tracking-wider text-[#1a1a1a] font-bold flex items-center gap-1"
                         htmlFor="subject"
                       >
-                        <span>Sujet de votre demande</span>
+                        <span>{t('Sujet de votre demande', 'Subject of your request')}</span>
                         <span className="text-[#c11236]">*</span>
                       </label>
                       <div className="relative flex items-center">
@@ -402,18 +425,13 @@ function Contact() {
                           required
                         >
                           <option disabled value="">
-                            Sélectionnez un sujet
+                            {t('Sélectionnez un sujet', 'Select a subject')}
                           </option>
-                          <option value="inscription">
-                            Inscription &amp; Accréditation
-                          </option>
-                          <option value="soumission">
-                            Soumission de résumé scientifique
-                          </option>
-                          <option value="sponsoring">
-                            Sponsoring &amp; Partenariat institutionnel
-                          </option>
-                          <option value="autre">Autre demande</option>
+                          {Object.entries(SUBJECT_LABELS).map(([key, label]) => (
+                            <option key={key} value={key}>
+                              {label[lang]}
+                            </option>
+                          ))}
                         </select>
                         <ChevronDown className="w-4 h-4 absolute right-3.5 text-[#555555] pointer-events-none" />
                       </div>
@@ -425,14 +443,17 @@ function Contact() {
                         className="text-xs font-mono uppercase tracking-wider text-[#1a1a1a] font-bold flex items-center gap-1"
                         htmlFor="message"
                       >
-                        <span>Votre message</span>
+                        <span>{t('Votre message', 'Your message')}</span>
                         <span className="text-[#c11236]">*</span>
                       </label>
                       <textarea
                         className="w-full p-4 bg-[#f8f8fa] border border-[#dce0e8] rounded-xl text-sm text-[#1a1a1a] placeholder:text-[#555555]/60 focus:bg-white focus:outline-none focus:border-[#8b0a1d] focus:ring-2 focus:ring-[#8b0a1d]/15 transition-all min-h-[150px] resize-y"
                         id="message"
                         name="message"
-                        placeholder="Précisez votre demande, votre institution ou vos références de dossier..."
+                        placeholder={t(
+                          'Précisez votre demande, votre institution ou vos références de dossier...',
+                          'Describe your request, your institution or your file references...'
+                        )}
                         required
                         rows="5"
                       />
@@ -447,10 +468,10 @@ function Contact() {
                           type="checkbox"
                         />
                         <span className="text-xs text-[#555555] group-hover:text-[#1a1a1a] transition-colors leading-relaxed">
-                          J’accepte que mes coordonnées soient traitées par le
-                          secrétariat GEDREPACAM pour le suivi de ma demande,
-                          conformément à la politique d’éthique et de
-                          confidentialité biomédicale.
+                          {t(
+                            'J’accepte que mes coordonnées soient traitées par le secrétariat GEDREPACAM pour le suivi de ma demande, conformément à la politique d’éthique et de confidentialité biomédicale.',
+                            'I agree that my contact details may be processed by the GEDREPACAM secretariat to follow up on my request, in accordance with the biomedical ethics and privacy policy.'
+                          )}
                         </span>
                       </label>
                     </div>
@@ -461,13 +482,13 @@ function Contact() {
                         className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#8b0a1d] hover:bg-[#c11236] text-white text-sm font-bold transition-all shadow-xs flex items-center justify-center gap-2 group cursor-pointer"
                         type="submit"
                       >
-                        <span>Ouvrir ma messagerie</span>
+                        <span>{t('Ouvrir ma messagerie', 'Open my email app')}</span>
                         <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
 
                       <div className="flex items-center gap-1.5 text-[#555555] text-xs font-medium">
                         <Lock className="w-3.5 h-3.5 text-[#00765a] shrink-0" />
-                        <span>Envoi direct depuis votre boîte mail</span>
+                        <span>{t('Envoi direct depuis votre boîte mail', 'Sent directly from your mailbox')}</span>
                       </div>
                     </div>
                   </form>
@@ -487,11 +508,13 @@ function Contact() {
             </div>
             <div>
               <h3 className="font-editorial-serif text-lg font-bold text-[#1a1a1a]">
-                Badges &amp; Accréditations
+                {t('Badges & Accréditations', 'Badges & Accreditation')}
               </h3>
               <p className="text-xs sm:text-sm text-[#555555] mt-1 leading-relaxed">
-                Retrait direct au guichet d’accueil du Palais des Congrès dès le
-                25 mai 2027 à 07h30.
+                {t(
+                  'Retrait direct au guichet d’accueil du Palais des Congrès dès le 25 mai 2027 à 07h30.',
+                  'Collect at the Conference Centre reception desk from 25 May 2027 at 7:30 am.'
+                )}
               </p>
             </div>
           </div>
@@ -502,11 +525,13 @@ function Contact() {
             </div>
             <div>
               <h3 className="font-editorial-serif text-lg font-bold text-[#1a1a1a]">
-                Comité Scientifique
+                {t('Comité Scientifique', 'Scientific Committee')}
               </h3>
               <p className="text-xs sm:text-sm text-[#555555] mt-1 leading-relaxed">
-                Évaluation continue des résumés, posters et communications
-                orales par les rapporteurs.
+                {t(
+                  'Évaluation continue des résumés, posters et communications orales par les rapporteurs.',
+                  'Ongoing review of abstracts, posters and oral presentations by the reviewers.'
+                )}
               </p>
             </div>
           </div>
@@ -517,11 +542,13 @@ function Contact() {
             </div>
             <div>
               <h3 className="font-editorial-serif text-lg font-bold text-[#1a1a1a]">
-                Visas &amp; Accueil Délégués
+                {t('Visas & Accueil Délégués', 'Visas & Delegate Welcome')}
               </h3>
               <p className="text-xs sm:text-sm text-[#555555] mt-1 leading-relaxed">
-                Lettres d’invitation officielles délivrées sous 72h pour les
-                participants internationaux.
+                {t(
+                  'Lettres d’invitation officielles délivrées sous 72h pour les participants internationaux.',
+                  'Official invitation letters issued within 72 hours for international participants.'
+                )}
               </p>
             </div>
           </div>

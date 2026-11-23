@@ -12,9 +12,11 @@ import {
   CalendarCheck
 } from 'lucide-react';
 import { genererSignatureBadge } from './utils/badgeUtils';
+import { useLang } from './context/LanguageContext';
 
 function VerifierBadge() {
   const [searchParams] = useSearchParams();
+  const { t } = useLang();
   const [etatScan, setEtatScan] = useState('LOADING'); // LOADING | VALID | ALREADY_USED | OUT_OF_DATES | INVALID
   const [infoPassage, setInfoPassage] = useState('');
   const [joursPresents, setJoursPresents] = useState(null);
@@ -51,7 +53,7 @@ function VerifierBadge() {
         import.meta.env.VITE_APPS_SCRIPT_URL;
 
       if (!scriptUrl) {
-        setAlerteSynchro("URL du script de pointage non configurée (pointage non enregistré).");
+        setAlerteSynchro('NO_SCRIPT');
         setEtatScan('VALID');
         return;
       }
@@ -81,7 +83,7 @@ function VerifierBadge() {
         }
       } catch (err) {
         console.error("Erreur de connexion au registre Google Sheets :", err);
-        setAlerteSynchro("Registre Google Sheets injoignable (pointage non enregistré).");
+        setAlerteSynchro('UNREACHABLE');
         setEtatScan('VALID');
       }
     };
@@ -95,7 +97,7 @@ function VerifierBadge() {
         {etatScan === 'LOADING' && (
           <div className="p-10 text-center space-y-3">
             <Loader2 size={44} className="mx-auto animate-spin text-[#00765a]" />
-            <p className="font-bold text-gray-700">Vérification du pointage journalier...</p>
+            <p className="font-bold text-gray-700">{t('Vérification du pointage journalier...', 'Checking daily attendance...')}</p>
           </div>
         )}
 
@@ -103,16 +105,18 @@ function VerifierBadge() {
           <>
             <div className="bg-[#00765a] text-white p-6 text-center">
               <CheckCircle2 size={52} className="mx-auto mb-2" />
-              <h1 className="text-2xl font-extrabold tracking-tight">ACCÈS AUTORISÉ</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">{t('ACCÈS AUTORISÉ', 'ACCESS GRANTED')}</h1>
               {infoPassage && <p className="text-xs opacity-90 mt-1">{infoPassage}</p>}
               {joursPresents && (
                 <span className="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-white/20 text-xs font-bold">
-                  <CalendarCheck size={14} /> Présence enregistrée : {joursPresents} / 3 jours
+                  <CalendarCheck size={14} /> {t('Présence enregistrée :', 'Attendance recorded:')} {joursPresents} / 3 {t('jours', 'days')}
                 </span>
               )}
               {alerteSynchro && (
                 <p className="mt-3 rounded-lg bg-black/25 px-3 py-1.5 text-[11px] font-semibold text-amber-200">
-                  {alerteSynchro}
+                  {alerteSynchro === 'NO_SCRIPT'
+                    ? t('URL du script de pointage non configurée (pointage non enregistré).', 'Check-in script URL not configured (check-in not recorded).')
+                    : t('Registre Google Sheets injoignable (pointage non enregistré).', 'Google Sheets register unreachable (check-in not recorded).')}
                 </p>
               )}
             </div>
@@ -131,10 +135,13 @@ function VerifierBadge() {
           <>
             <div className="bg-amber-600 text-white p-6 text-center">
               <AlertTriangle size={52} className="mx-auto mb-2" />
-              <h1 className="text-2xl font-extrabold tracking-tight">DÉJÀ SCANNÉ AUJOURD'HUI</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">{t("DÉJÀ SCANNÉ AUJOURD'HUI", 'ALREADY SCANNED TODAY')}</h1>
               <p className="text-sm font-semibold mt-1">{infoPassage}</p>
               <p className="text-xs opacity-90 mt-2">
-                Ce badge a déjà été validé pour la journée en cours. Vérifiez la pièce d'identité du porteur.
+                {t(
+                  "Ce badge a déjà été validé pour la journée en cours. Vérifiez la pièce d'identité du porteur.",
+                  "This badge has already been validated today. Please check the holder's ID."
+                )}
               </p>
             </div>
             <DetailsParticipant
@@ -152,7 +159,7 @@ function VerifierBadge() {
           <>
             <div className="bg-slate-700 text-white p-6 text-center">
               <AlertTriangle size={52} className="mx-auto mb-2" />
-              <h1 className="text-xl font-extrabold tracking-tight">HORS DATES DU CONGRÈS</h1>
+              <h1 className="text-xl font-extrabold tracking-tight">{t('HORS DATES DU CONGRÈS', 'OUTSIDE CONGRESS DATES')}</h1>
               <p className="text-sm opacity-90 mt-1">{infoPassage}</p>
             </div>
             <DetailsParticipant
@@ -170,20 +177,26 @@ function VerifierBadge() {
           <>
             <div className="bg-[#c11236] text-white p-6 text-center">
               <XCircle size={52} className="mx-auto mb-2" />
-              <h1 className="text-2xl font-extrabold tracking-tight">BADGE INVALIDE</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">{t('BADGE INVALIDE', 'INVALID BADGE')}</h1>
               <p className="text-sm opacity-90 mt-1">
-                Ce QR code est falsifié ou absent de la liste des inscriptions payées.
+                {t(
+                  'Ce QR code est falsifié ou absent de la liste des inscriptions payées.',
+                  'This QR code is forged or not on the list of paid registrations.'
+                )}
               </p>
             </div>
             <div className="p-6 text-center text-sm text-gray-600">
-              Orientez la personne vers le secrétariat d'accueil pour contrôle manuel du reçu Fapshi.
+              {t(
+                "Orientez la personne vers le secrétariat d'accueil pour contrôle manuel du reçu Fapshi.",
+                'Direct the person to the reception desk for a manual check of the Fapshi receipt.'
+              )}
             </div>
           </>
         )}
 
         <div className="bg-gray-50 px-6 py-4 text-center border-t border-gray-100">
           <Link to="/" className="text-xs font-bold text-gray-500 hover:text-gray-800 underline">
-            Retour au portail GEDREPACAM
+            {t('Retour au portail GEDREPACAM', 'Back to the GEDREPACAM portal')}
           </Link>
         </div>
       </div>
@@ -192,10 +205,11 @@ function VerifierBadge() {
 }
 
 function DetailsParticipant({ prenoms, noms, telephone, profession, institution, transId }) {
+  const { t } = useLang();
   return (
     <div className="p-6 space-y-4">
       <div className="text-center border-b border-gray-100 pb-4">
-        <p className="text-xs uppercase tracking-wider text-gray-400 font-bold">Titulaire du badge</p>
+        <p className="text-xs uppercase tracking-wider text-gray-400 font-bold">{t('Titulaire du badge', 'Badge holder')}</p>
         <h2 className="text-2xl font-extrabold text-gray-900 mt-1">
           {prenoms} <span className="uppercase">{noms}</span>
         </h2>
@@ -205,7 +219,7 @@ function DetailsParticipant({ prenoms, noms, telephone, profession, institution,
         <div className="flex items-center gap-3 text-gray-700">
           <Phone size={18} className="text-[#00765a] shrink-0" />
           <div>
-            <span className="text-xs text-gray-400 block">Téléphone</span>
+            <span className="text-xs text-gray-400 block">{t('Téléphone', 'Phone')}</span>
             <span className="font-bold">{telephone}</span>
           </div>
         </div>
@@ -231,7 +245,7 @@ function DetailsParticipant({ prenoms, noms, telephone, profession, institution,
         <div className="flex items-center gap-3 text-gray-700">
           <Hash size={18} className="text-[#c11236] shrink-0" />
           <div>
-            <span className="text-xs text-gray-400 block">Référence Transaction </span>
+            <span className="text-xs text-gray-400 block">{t('Référence Transaction', 'Transaction reference')}</span>
             <span className="font-mono font-bold text-[#c11236]">{transId}</span>
           </div>
         </div>
