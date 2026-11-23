@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import BadgeConference from './BadgeConference';
 import { construireUrlBadge } from './utils/badgeUtils';
 import { useLang } from './context/LanguageContext';
+import { API_BASE, reveillerServeur } from './lib/api';
 
-// Adresse du serveur Laravel (variable VITE_API_URL dans frontend/.env)
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const attendre = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function Paiement() {
   const location = useLocation();
@@ -15,6 +15,11 @@ function Paiement() {
   const [message, setMessage] = useState('');
   const [confirmedTransId, setConfirmedTransId] = useState(null);
   const { t } = useLang();
+
+  // Au cas où le visiteur arrive ici sans passer par la page Inscription
+  useEffect(() => {
+    reveillerServeur();
+  }, []);
 
   const donnees = location.state?.donneesInscription;
   const montant = location.state?.montant;
@@ -49,16 +54,33 @@ function Paiement() {
         }
       };
 
-      // 1. Demande de paiement envoyée sur le téléphone
-      const initRes = await fetch(`${API_BASE}/api/paiements/initier`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          profession: donnees.profession,
-          telephone: donnees.telephone,
-          email: donnees.email
-        })
-      });
+      // 1. Demande de paiement envoyée sur le téléphone.
+      // Si le serveur gratuit sort de veille, Render peut répondre 502/503/504 :
+      // la demande n'a alors pas atteint le serveur, on peut réessayer sans risque.
+      const messageLent = setTimeout(
+        () => setMessage(t('Connexion au service de paiement… merci de patienter', 'Connecting to the payment service… please wait')),
+        4000
+      );
+      let initRes;
+      try {
+        const debut = Date.now();
+        for (;;) {
+          initRes = await fetch(`${API_BASE}/api/paiements/initier`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              profession: donnees.profession,
+              telephone: donnees.telephone,
+              email: donnees.email
+            })
+          });
+          const enDemarrage = [502, 503, 504].includes(initRes.status);
+          if (!enDemarrage || Date.now() - debut > 120000) break;
+          await attendre(5000);
+        }
+      } finally {
+        clearTimeout(messageLent);
+      }
 
       const paymentData = await lireJson(initRes);
       if (!initRes.ok || !paymentData.transId) {

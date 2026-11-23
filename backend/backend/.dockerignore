@@ -1,0 +1,16 @@
+# Fichiers à ne pas copier dans l'image Docker
+.env
+.env.backup
+.env.production
+.git
+vendor
+node_modules
+tests
+Procfile
+.phpunit.result.cache
+storage/logs/*.log
+storage/framework/views/*.php
+storage/framework/sessions/*
+storage/framework/cache/data/*
+# Caches générés sur Windows (ils sont recréés pendant la construction)
+bootstrap/cache/*.php

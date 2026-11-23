@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   GraduationCap,
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useLang } from './context/LanguageContext';
 import { compresserImage } from './utils/compressImage';
+import { reveillerServeur } from './lib/api';
 
 // Grille tarifaire officielle finale en FCFA
 const CATEGORIES_TARIFS = [
@@ -149,6 +150,11 @@ function Inscription() {
   const [fileError, setFileError] = useState('');
   const [compressionEnCours, setCompressionEnCours] = useState(false);
   const { t, pick, lang } = useLang();
+
+  // Réveille le serveur de paiement pendant que le visiteur remplit le formulaire
+  useEffect(() => {
+    reveillerServeur();
+  }, []);
 
   const formaterTaille = (octets) =>
     octets >= 1024 * 1024
